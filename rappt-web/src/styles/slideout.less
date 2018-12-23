@@ -1,0 +1,82 @@
+.slideout-container {
+  position: relative;
+}
+
+slideout {
+  // Commented styles implemented in slideout.coffee due to parameters
+  // @slideout-width: 500px;
+  @slideout-tab-width: 5ex;
+
+  display: block;
+  z-index: 500;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: @slideout-tab-width;
+  height: 100%;
+  overflow: hidden;
+
+  transition-duration: 0.3s;
+
+  // &.slideout-active {
+  //   width: calc(@slideout-width ~"+" @slideout-tab-width);
+
+  //   .slideout-tab {
+  //     right: @slideout-width;
+  //   }
+  // }
+
+  .slideout-tab {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    width: @slideout-tab-width;
+
+    transition-duration: inherit;
+
+    background-color: @brand-primary;
+    color: @btn-primary-color;
+    border-radius: 3px 0 0 3px;
+    cursor: pointer;
+
+    // Rotation work adapted from http://kizu.ru/en/fun/rotated-text/
+    div {
+      overflow: hidden;
+      display: inline-block;
+
+      padding-top: 2em;
+      // .slideout-tab has bottom padding I can't find the origin of,
+      // so this is .5em smaller
+      padding-bottom: 1.5em;
+
+      span {
+        display: inline-block;
+        white-space: nowrap;
+
+        transform-origin: left top;
+        transform: rotate(90deg) translate(0, -(@slideout-tab-width - 1ex));
+
+        text-transform: uppercase;
+
+        // make the element square so the parent height is increased
+        &:before {
+          content: "";
+          float: left;
+          margin-top: 100%;
+        }
+      }
+    }
+  }
+
+  .slideout-content {
+    position: relative;
+    left: @slideout-tab-width;
+    //width: @slideout-width;
+    height: 100%;
+    overflow: auto;
+
+    background-color: @rappt-primary-lighter;
+    color: @btn-primary-color;
+    border-left: 2px solid @brand-primary;
+  }
+}

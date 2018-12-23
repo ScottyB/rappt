@@ -1,0 +1,18 @@
+<div class="code-browser-container">
+  <div class="code-browser-treebar">
+    <treecontrol class="tree-classic"
+         tree-model="codeBrowserTree"
+         options="treeOptions"
+         expanded-nodes="treeExpanded"
+         selected-node="treeSelected"
+         on-selection="showFile(node)">
+         {{node.name}}
+      </treecontrol>
+  </div>
+  <div>
+    <img ng-src="{{image}}" ng-show="showingImage"/>
+  </div>
+  <div class="code-browser-display" ng-show="!showingImage">
+    <div ui-codemirror="{ onLoad: codemirrorLoaded }" ng-model="codeIn" ui-codemirror-opts="editorOpts"></div>
+  </div>
+</div>

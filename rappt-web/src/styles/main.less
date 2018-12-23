@@ -1,0 +1,117 @@
+@import url("//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css");
+@import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc2/css/bootstrap-glyphicons.css");
+@import url("//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800");
+
+@icon-font-path:          "../public/fonts/";
+
+.browsehappy {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+.header {
+    z-index: @zindex-navbar;
+    margin-bottom: 0;
+    border-radius: 0 !important;
+    display: flex;
+    justify-content: space-between;
+    box-shadow: none;
+    h1 {
+        margin: 0;
+    }
+    .alpha-mark {
+        font-weight: lighter;
+        font-size: 0.6em;
+        color: @rappt-grey-lighter;
+        vertical-align: -0.4em;
+    }
+    .navbar-collapse {
+        display: flex !important;
+        flex-grow: 1;
+        justify-content: space-between;
+        .project-name {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+        }
+        .form-control {
+            margin-left: 1em;
+            box-shadow: 0px -1px 0px @rappt-grey-lighter inset;
+            &:focus {
+                box-shadow: 0px -2px 0px @rappt-white inset;
+            }
+            &.ng-invalid, &.ng-invalid:focus {
+              box-shadow: 0px -2px 0px @brand-danger inset;
+            }
+        }
+
+    }
+}
+
+.header-button {
+  display: block;
+  margin-top: 14px;
+  margin-left: 2em;
+}
+
+.tab-bar {
+    background-color: @brand-primary;
+    height: 43px;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3);
+    z-index: @zindex-navbar - 1;
+    position: relative;  // z-index only effects positioned elements
+    text-transform: uppercase;
+    li a {
+        color: @btn-primary-color;
+        box-shadow: none;
+        &:hover {
+            color: @brand-warning;
+            box-shadow: none;
+        }
+        &:focus {
+            color: @btn-primary-color !important;
+            border: none !important;
+        }
+        &.active {
+            box-shadow: 0px -2px 0px @brand-warning inset; // no box-shadow-color. thanks CSS!
+            color: @navbar-inverse-link-color;
+            z-index: 1;
+            &:hover {
+                color: @btn-primary-color;
+            }
+        }
+    }
+}
+
+a[ng-click], a[ui-sref] {
+    cursor: pointer;
+}
+
+.container-fluid {
+    padding: 0;
+    .content {
+        padding: 0;
+        height: ~"calc(100vh - 108px)";
+    }
+}
+
+.modal-footer {
+    text-align: center;
+    button {
+        width: 15em;
+    }
+}
+
+.modal-backdrop {
+    height: 100%;
+}
+
+p.lead {
+    color: @gray;
+}
+
+textarea {
+  resize:vertical;
+}

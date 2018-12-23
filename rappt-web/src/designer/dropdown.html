@@ -1,0 +1,7 @@
+<div class="dropdown" ng-show="isVisible">
+  <ul class="dropdown-menu-new" role="menu">
+    <li ng-repeat="choice in items" >
+      <a href ng-click="makeChoice($event, choice)">{{choice.text}}</a>
+    </li>
+  </ul>
+</div>

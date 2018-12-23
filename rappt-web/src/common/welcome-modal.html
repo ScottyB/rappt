@@ -1,0 +1,36 @@
+<div>
+    <div class="modal-header">
+        <h3 class="modal-title text-center">Welcome to rappt</h3>
+    </div>
+
+    <form name="form" novalidate ng-submit="$close()">
+        <div class="modal-body">
+            <p class="lead col-md-12">What do you want to call your project?</p>
+            <div class="form-group col-md-12" ng-class="{'has-error': form.projectName.$invalid &amp;&amp; form.projectName.$dirty}">
+                <input type="text" name="projectName" id="projectName" class="form-control"
+                ng-model="project.model.name" valid-project-name
+                placeholder="MyProject" take-focus tabindex="1">
+                <label ng-show="form.projectName.$invalid &amp;&amp; form.projectName.$dirty" class="control-label" for="projectName">
+                    Must be of the form <i>YourProject</i>
+                </label>
+            </div>
+            <div class="form-group col-md-12" ng-class="{'has-error': form.packageName.$invalid &amp;&amp; form.packageName.$dirty}">
+                <input type="text" name="packageName" id="packageName" class="form-control col-md-6"
+                ng-model="project.model.packageName" valid-package-name
+                placeholder="com.package.name" tabindex="1">
+                <label ng-show="form.packageName.$invalid &amp;&amp; form.packageName.$dirty" class="control-label" for="packageName">
+                    Must be of the form <i>com.example.your.project</i>
+                </label>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button ng-disabled="!form.$valid" class="btn btn-primary text-right" type="submit" tabindex="1">Start</button>
+
+            <p>
+                Developed by the <a href="http://www.ssil.com.au/" target="_blank">Swinburne Software Innovation Lab</a>.
+                <a popover="Rappt is still under development. Your program data will be used for research purposes.">Disclaimer</a>.
+            </p>
+        </div>
+    </form>
+</div>

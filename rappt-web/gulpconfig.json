@@ -1,0 +1,84 @@
+{
+  "serverPort": 9000,
+  "buildDir": "dist",
+    "index": "src/*.html",
+  "vendorDir": "vendor",
+  "styles": [
+    "vendor/bootstrap/less/bootstrap.less",
+    "vendor/bootswatch/paper/variables.less",
+    "vendor/bootswatch/paper/bootswatch.less",
+    "vendor/codemirror/lib/codemirror.css",
+    "vendor/codemirror/addon/fold/foldgutter.css",
+    "vendor/angular-xeditable/dist/css/xeditable.css",
+    "vendor/angular-tree-control/css/tree-control.css",
+    "src/styles/**/*.less"
+  ],
+  "scripts": [
+    "vendor/**/angular.js",
+    "vendor/angular-bootstrap/ui-bootstrap.js",
+    "vendor/angular-bootstrap/ui-bootstrap-tpls.js",
+    "vendor/codemirror/lib/codemirror.js",
+    "vendor/codemirror/addon/mode/simple.js",
+    "vendor/codemirror/addon/edit/matchbrackets.js",
+    "vendor/codemirror/addon/edit/closebrackets.js",
+    "vendor/codemirror/addon/fold/foldcode.js",
+    "vendor/codemirror/addon/fold/foldgutter.js",
+    "vendor/codemirror/addon/fold/brace-fold.js",
+    "vendor/angular-cookies/angular-cookies.js",
+    "vendor/angular-animate/angular-animate.js",
+    "vendor/angular-ui-router/release/angular-ui-router.js",
+    "vendor/angular-ui-codemirror/ui-codemirror.js",
+    "vendor/angular-xeditable/dist/js/xeditable.js",
+    "vendor/angular-dragdrop/src/angular-dragdrop.js",
+    "vendor/angular-tree-control/angular-tree-control.js",
+    "vendor/zip.js/WebContent/zip.js",
+    "vendor/zip.js/WebContent/inflate.js",
+    "vendor/zip.js/WebContent/zip-fs.js",
+    "vendor/zip.js/WebContent/zip-ext.js",
+
+    "src/*.coffee",
+    "src/**/*.coffee"
+
+  ],
+  "templates": [
+    "src/**/*.html",
+    "!src/rappt-app.html"
+  ],
+  "public": [
+    "public/**/*"
+  ],
+  "fonts": [
+    "vendor/bootstrap/fonts/*"
+  ],
+  "images":[
+    "vendor/angular-tree-control/images/*"
+  ],
+  "environments": [{
+    "name": "development",
+    "minify": false,
+    "styles": [
+      "src/environment/development/**/*.less"
+    ],
+    "scripts": [
+      "src/environment/development/**/*.coffee"
+    ]
+  }, {
+    "name": "staging",
+    "minify": true,
+    "styles": [
+      "src/environment/staging/**/*.less"
+    ],
+    "scripts": [
+      "src/environment/staging/**/*.coffee"
+    ]
+  }, {
+    "name": "production",
+    "minify": true,
+    "styles": [
+      "src/environment/production/**/*.less"
+    ],
+    "scripts": [
+      "src/environment/production/**/*.coffee"
+    ]
+  }]
+}

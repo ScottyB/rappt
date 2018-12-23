@@ -1,0 +1,28 @@
+<div class="graph" ng-mouseup="mouseUp($event)" >
+  <h1 ng-show="nodes.length < 3">Right-click to add screen</h1>
+  <svg class="svg {{isDraggingConnection ? 'pointer' : ''}}"  xmlns="http://www.w3.org/2000/svg"  version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" ng-mousemove="connectorMouseMove($event)">
+    <g ng-if="isDraggingConnection">
+      <circle r="4" ng-attr-cx="{{draggingConnection.x1}}" ng-attr-cy="{{draggingConnection.y1}}" fill="blue" />
+      <path ng-attr-d="M {{draggingConnection.x1}} {{draggingConnection.y1}} C {{draggingConnection.cx1}} {{draggingConnection.cy1}} {{draggingConnection.cx2}} {{draggingConnection.cy2}} {{draggingConnection.x2}} {{draggingConnection.y2}}" stroke-width="3" stroke="blue" fill="none"/>
+    </g>
+
+    <g ng-repeat="n in nodes" ng-attr-id="{{n.svgId}}" ng-attr-transform="translate({{n.x}}, {{n.y}})">
+      <rect ng-attr-class="node-screen" ry="10" rx="10" x="0" y="0" ng-attr-width="{{n.width}}" ng-attr-height="{{n.height}}" fill="white"/>
+
+      <g ng-repeat="connector in n.inConnectors" ng-mouseup="connectorMouseUp($event, connector, n)">
+        <circle ng-attr-r="{{connector.r}}" class="connector-circle" ng-attr-cx="{{connector.x}}" ng-attr-cy="{{connector.y}}" cx="0" cy="40"></circle>
+      </g>
+
+      <g class="pointer" ng-repeat="connector in n.outConnectors" ng-mousedown="connectorMouseDown($event, connector, n)">
+        <circle ng-attr-r="{{connector.r}}" class="connector-circle" ng-attr-cx="{{connector.x}}" ng-attr-cy="{{connector.y}}" cx="0" cy="40"></circle>
+      </g>
+    </g>
+
+    <g ng-repeat="l in links">
+      <circle r="4" ng-attr-cx="{{l.points.x1}}" ng-attr-cy="{{l.points.y1}}" fill="blue" style="pointer-events: none;"/>
+      <circle r="4" ng-attr-cx="{{l.points.x2}}" ng-attr-cy="{{l.points.y2}}" fill="blue" style="pointer-events: none;" />
+      <path ng-attr-id="{{l.id}}" ng-attr-d="M {{l.points.x1}} {{l.points.y1}} C {{l.points.cx1}} {{l.points.cy1}} {{l.points.cx2}} {{l.points.cy2}} {{l.points.x2}} {{l.points.y2}}" stroke-width="3" stroke="blue" fill="none"/>
+    </g>
+  </svg>
+  <node ng-repeat="n in nodes" id='{{n.htmlId}}' screen-id="{{n.id}}" ng-style="{left: ( n.x + 'px'), top: (n.y + 'px')}"></node>
+</div>

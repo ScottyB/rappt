@@ -1,0 +1,27 @@
+.code-browser-container {
+  display: flex;
+  height: 100%;
+}
+
+.code-browser-treebar {
+  border-right: 1px solid #ddd;
+}
+
+.code-browser-display {
+  flex: 4;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+treecontrol.tree-classic li.tree-expanded i.tree-branch-head {
+  background: url("public/images/folder.png") no-repeat;
+}
+
+treecontrol.tree-classic li.tree-collapsed i.tree-branch-head {
+  background: url("public/images/folder-closed.png") no-repeat;
+}
+
+treecontrol.tree-classic li.tree-leaf i.tree-leaf-head {
+  background: url("public/images/file.png") no-repeat;
+}

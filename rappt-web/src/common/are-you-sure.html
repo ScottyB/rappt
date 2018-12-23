@@ -1,0 +1,15 @@
+<div>
+    <div class="modal-header">
+        <h3 class="modal-title text-center">New Project</h3>
+    </div>
+
+    <form name="form" novalidate ng-submit="$close()">
+      <div class="modal-body">
+        <p class="lead col-md-12">Are you sure you want to delete the current project?</p>
+      </div>
+      <div class="modal-footer">
+        <button ng-click="clearProject()" class="btn btn-primary text-right">Yes</button>
+        <button class="btn btn-primary text-right">No</button>
+      </div>
+    </form>
+</div>

@@ -1,0 +1,6 @@
+<a ng-click="generate()" ng-disabled="generating || toBeValidated()"
+    class="header-button btn {{ toBeValidated() ? 'btn-warning' : 'btn-success' }}">
+  <i ng-hide="!generating" class="fa fa-cog" ng-class="{'fa-spin': generating}"></i>
+  <i ng-hide="generating" class="glyphicon glyphicon-cloud-download"></i>
+  Download
+</a>

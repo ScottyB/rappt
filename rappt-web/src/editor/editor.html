@@ -1,0 +1,15 @@
+<div class="main-editor error-list-container">
+  <div class="editor slideout-container error-list-sibling">
+    <div ui-codemirror="{ onLoad: codemirrorLoaded }" ui-codemirror-opts="editorOpts"
+        ng-model="project.viewCache.dsl" ng-change="project.dirty('dsl')"></div>
+    <slideout slideout-title="Samples">
+      <accordion>
+        <accordion-group ng-repeat="sample in samples" heading="{{sample.name}}"
+            ng-click="selectSample($event, sample)" ng-class="sampleClass(sample)">
+          <pre><code>{{sample.code}}</code></pre>
+        </accordion-group>
+      </accordion>
+    </slideout>
+  </div>
+  <error-list project="project" go-to-error="goToError" view-type="dsl"></error-list>
+</div>

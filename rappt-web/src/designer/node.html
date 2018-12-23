@@ -1,0 +1,9 @@
+<div class="node noselect" ng-mousedown="onMouseDown($event)">
+  <span>Screen</span>
+  <form>
+    <input onkeyup="this.value = this.value.replace(/[^a-zA-Z0-9]/, '')" onClick="this.select();" name="id" type="text" placeholder="ScreenId" ng-model="screen.id" value="{{screenId}}"/>
+  </form>
+  <ul>
+    <li ><span class="left">From</span><span class="right">Navigate to:</span></li>
+  </ul>
+</div>

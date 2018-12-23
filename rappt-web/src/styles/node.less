@@ -1,0 +1,48 @@
+.node {
+  width: 140px;
+  height: 90px; //todo: connect with graph-service
+
+  background: rgba(255,255,255,0.9);
+  border-radius: 10px;
+  border: 1px solid black;
+  padding: 5px;
+  cursor: move;
+  ul {
+    list-style-type: none;
+    padding-left: 0px;
+    -webkit-padding-start: 0px;
+    li {
+      text-align: right;
+    }
+  }
+  .connector {
+    margin:0px 5px;
+    display: inline-block;
+    background: blue;
+    border-radius: 50%;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  h5 {
+    display: inline-block;
+    color: grey;
+    text-align: center;
+    font-size: 1.5em;
+    margin: 0;
+  }
+
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+input {
+  width: 100%;
+}

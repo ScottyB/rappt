@@ -1,0 +1,62 @@
+@error-bar-height: 25px;
+
+.error-list-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.error-list-sibling {
+    flex: 2;
+    min-height: 0;  // somehow this ensures Firefox reflows for the error list
+}
+
+.error-list {
+    flex-basis: @error-bar-height;
+    width: 100%;
+    overflow: hidden;
+    &.error-list-expanded {
+        flex: 1;
+    }
+}
+
+.error-bar {
+    height: @error-bar-height;
+    display: flex;
+    &.bar-ok, &.bar-validating {
+        background-color: @gray-light;
+        color: @text-color;
+    }
+    &.bar-errors {
+        background-color: @brand-warning;
+        cursor: pointer;
+        .badge {
+            background-color: @text-color;
+            color: @brand-warning;
+        }
+    }
+    div {
+        margin-left: 1em;
+        flex: 1;
+    }
+    button {
+        height: 100%;
+        border-radius: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+}
+
+.error-details {
+    overflow: auto;
+    background-color: @body-bg;
+    padding: 15px;
+    padding-top: 10px;
+    width: 100%;
+    height: calc(100% ~"-" @error-bar-height);
+    .error-line {
+        margin-bottom: 10px;
+        a {
+            color: @text-color;
+        }
+    }
+}

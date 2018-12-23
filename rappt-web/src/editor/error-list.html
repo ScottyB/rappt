@@ -1,0 +1,30 @@
+<div ng-class="{'error-list': true, 'error-list-expanded': errorListVisible()}">
+    <div class="error-bar {{validating ? 'bar-validating' : (project.hasErrors() ? 'bar-errors' : 'bar-ok')}}"
+            ng-click="flipErrorListVisibility()">
+        <div>
+            <span ng-show="project.hasErrors() &amp;&amp; !validating">
+                Click to {{errorListVisible() ? 'hide' : 'show'}} <span class="badge">{{project.errors.length}}</span>
+                {{project.errors.length === 1 ? 'error' : 'errors'}}.
+            </span>
+            <span ng-show="!project.hasErrors() &amp;&amp; !project.dirtied">
+                Project valid.
+            </span>
+            <span ng-show="project.dirtied &amp;&amp; !validating &amp;&amp; project.hasNamesSet()">
+                Click validate to check for errors.
+            </span>
+            <span ng-show="!project.hasNamesSet()">
+                Please set valid package and project names.
+            </span>
+        </div>
+        <button ng-disabled="validating || !project.dirtied || !project.hasNamesSet()" ng-click="validateClick($event)"
+                class="btn {{!project.hasNamesSet() ? 'btn-warning' : (project.dirtied || project.hasErrors() ? 'btn-primary' : 'btn-success')}}">
+            <i class="fa {{ validating ? 'fa-cog fa-spin' : 'fa-play-circle' }}"></i> Compile
+        </button>
+    </div>
+    <div class="pull-left error-details" ng-show="errorListVisible()">
+        <div class="error-line" ng-repeat="error in project.errors">
+            <span class="label label-danger">Error</span>
+            <a ng-click="goToError(error)">{{error}}</a>
+        </div>
+    </div>
+</div>
