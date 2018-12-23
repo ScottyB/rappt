@@ -11,6 +11,21 @@ RAPPT is a compiler and web application for generating Android apps using a Doma
 * `grammar.g4` - The grammar for the App Modelling Language
 * `criteria.md` - The criteria used as part of a user evaluation of RAPPT
 
+## How it Works? (Roughly)
+
+![](https://raw.github.com/scottyb/rappt/master/images/description.png)
+
+1. Describe the app you want to build using the DSL.
+2. A model of your app gets created by RAPPT.
+3. A set of transformation rules get executed to create a new model.
+4. Code gets generated from the new model!
+
+## Example Output
+
+App to copy on the left, generated output from RAPPT on the right!
+
+![](https://raw.github.com/scottyb/rappt/master/images/screenshots.png)
+
 ## Links for more information
 
 * Bootstrapping Mobile App Development: Short easy read [link](https://ts.data61.csiro.au/publications/nicta_full_text/8555.pdf)
