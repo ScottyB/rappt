@@ -1,0 +1,41 @@
+app {
+    landingPage = Main
+}
+
+model {
+    cards : [{
+        image : string
+        title : string
+        sub : string
+        sub1: string
+        address: string
+        date: string
+        section : string
+        rowlement: string
+        image1 : string
+        name : string
+    }]
+
+    view {
+        cards someCards = [image, title, sub, date]
+    }
+}
+
+Api {
+    id = Cards
+    url = "http://made-up-cards.com/api"
+    mockData = true
+    Endpoint {
+        url = "/"
+        id = allCards
+        response = model.cards
+    }
+}
+
+screen Main {
+    title "Main Screen"
+    controller {
+        data = Cards.allCards read model.view.someCards
+        ui write data
+    }
+}

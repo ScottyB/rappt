@@ -1,0 +1,31 @@
+app {
+    landingPage = Main
+    android-sdk "/Users/scottbarnett/android-sdk"
+}
+
+api RestCountries "http://restcountries.eu/rest/v1" {
+
+    /* Creates JSON stub files in the assets directory.
+       Program loads data from JSON files by default.
+       Fill out the JSON files to simulate API
+     */
+    mock-data true
+    GET australia "/alpha/aus"
+}
+
+screen Main  {
+    title = "Australia"
+    layout mainScreen {
+	on-load {
+	    call RestCountries.australia
+	}
+	label nameLabel "Name:"
+	label name:string
+	label CapitalLabel "Capital City:"
+	label capital:string
+	label regionLabel "Region:"
+	label region:string
+	label subRegionLabel "Sub Region:"
+	label subregion:string
+    }
+}

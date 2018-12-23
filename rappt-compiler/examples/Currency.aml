@@ -1,0 +1,29 @@
+app {
+    landingPage = MainScreen
+}
+
+api currency  {
+    base = "http://currency-api.appspot.com/api"
+    auth(type: token) {
+        tokenParam = "key"
+        apiKey = "cf6ccd6659ce43126c49f77eb5f4cec3285ef3a1"
+    }
+    endPoints {
+        australiaCurrency = GET (endPoint: "/australia")
+    }
+}
+
+screen MainScreen  {
+    title = "Main Screen"
+    model {
+        dataSource = source(endPoint: currency.australiaCurrency) {
+            resultId <= currency
+        }
+    }
+    view {
+        group mainScreenGroup {
+            fromInputId = label (text: "Currency for Australia:")
+            resultId = label(binding: dataSource)
+        }
+    }
+}

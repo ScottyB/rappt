@@ -1,0 +1,23 @@
+app {
+    fristScreen = mainScreen
+}
+
+screen mainScreen {
+    title = "Main Screen"
+    view {
+        msg = label(text: "Hello Scott")
+        buttn = button(text: "Secondary")
+    }
+    controller {
+        onClick buttn {
+            navigate-to secondaryScreen
+        }
+    }
+}
+
+screen secondaryScreen  {
+    title = "Secondary Screen"
+    view {
+        aMessage = label(text: "Temp")
+    }
+}

@@ -1,0 +1,188 @@
+imageView(e) ::= <<
+  <ImageView
+      android:layout_height="wrap_content"
+      android:layout_width="wrap_content"
+      $if(e.drawable)$android:src="@drawable/$e.drawable$"$endif$
+      android:id="@+id/$e.id$"
+      $style(e)$
+      />
+>>
+
+imageViewController(e) ::= <<
+>>
+
+textView(e) ::= <<
+  <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      $if(e.textId)$android:text="@string/$e.textId$"$endif$
+      android:id="@+id/$e.id$"
+      $style(e)$
+      $if(!e.styleName)$
+      style="@style/TextBody"
+      $endif$
+      />
+>>
+
+textViewController(e) ::= <<
+$if(e.hasValue)$
+    $if(e.doesReceiveEvent)$
+    $if(!e.isFragmentToFragment)$$e.eventClassName$ event = EventBus.getDefault().getStickyEvent($e.eventClassName$.class);$endif$
+    $e.id$.setText(event.$e.value$);
+    $else$
+    $e.id$.setText($e.value$);
+    $endif$
+$endif$
+>>
+
+editText(e) ::= <<
+<EditText
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+$if(e.isPassword)$android:inputType="textPassword"$endif$
+      android:hint="@string/$e.hintTextId$"
+      $style(e)$
+      android:id="@+id/$e.id$"
+      />
+>>
+
+editTextController(e) ::= <<
+
+>>
+
+button(e) ::= <<
+<Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/$e.textId$"
+      android:layout_marginTop="5dp"
+      android:id="@+id/$e.id$"
+      $style(e)$
+      />
+>>
+
+webView(e) ::= <<
+<WebView
+    android:id="@+id/$e.id$"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"/>
+>>
+
+webViewController(e) ::= <<
+$if(!e.handlesOAuth)$
+    @AfterViews
+    void setWebViewId() {
+        $e.id$.loadUrl(getString(R.string.$e.urlStringId$));
+        $e.id$.setWebViewClient(new WebViewClient());
+    }
+$else$
+  @Background
+    void makeRequest ( ) {
+        try {
+            handleResponse($e.appVariable$.fetchAuthURL());
+        } catch (Exception e) {
+            ErrorDialog.showError(context, e);
+        }
+        loadingFinished();
+    }
+
+    @UiThread
+    void handleResponse (String url) {
+        webViewId.loadUrl(url);
+        webViewId.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url.startsWith($e.appClass$.CALLBACK)) {
+                    final Uri uri = Uri.parse(url);
+                    fetchAccessToken(uri);
+                    return true;
+                }
+                return super.shouldOverrideUrlLoading(view, url);
+            }
+        });
+    }
+
+    @Background
+    void fetchAccessToken(Uri uri) {
+        try {
+            $e.appVariable$.fetchAccessToken(uri);
+            handleResponseAccess();
+        } catch (Exception e) {
+            ErrorDialog.showError(context, e);
+        }
+        loadingFinished();
+    }
+
+    @UiThread
+    void handleResponseAccess () {
+        $e.toClass$_.intent(context).start();
+        this.finish();
+    }
+
+    @AfterViews
+    void setWebViewId ( ) {
+        webViewId.setWebViewClient(new WebViewClient());
+        makeRequest();
+        loadingStarted();
+    }
+$endif$>>
+
+listView(e) ::= <<
+    <ListView android:id="@+id/$e.id$"
+              android:layout_width="match_parent"
+              $if(!e.hasOnItemEvent)$android:listSelector="@android:color/transparent"$endif$
+              android:layout_height="match_parent"
+    />
+>>
+
+listViewController(e) ::= <<
+$if(e.stringArrayId)$
+    @AfterViews
+    void init() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,
+                android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.$e.stringArrayId$));
+        $e.id$.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
+$endif$
+>>
+
+map(e) ::= <<
+    <fragment
+        android:id="@+id/$e.id$"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.google.android.gms.maps.MapFragment"/>
+>>
+
+mapController(e) ::= <<
+        googleMap = $e.id$.getMap();
+        $if(e.isNotInteractive)$
+        UiSettings settings = googleMap.getUiSettings();
+        settings.setZoomControlsEnabled(false);
+        settings.setAllGesturesEnabled(false);
+        $endif$
+        $if(e.handler)$
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                $e.handler$();
+            }
+        });$endif$
+
+        $e.staticMarkers: {m |
+        googleMap.addMarker(new MarkerOptions()
+                .title($m.title$)
+                $if(m.snippet)$.snippet($m.snippet$)$endif$
+                .position(new LatLng($m.latitude$, $m.longitude$)));
+        }$
+        $e.polyLines:{p |
+        googleMap.addPolyline(new PolylineOptions()
+                .add(new LatLng($p.startLat$, $p.startLong$),
+                     new LatLng($p.endLat$, $p.endLong$))
+                .geodesic(true));
+        }$
+$if(e.hasNoDynamic)$googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng($e.initialZoom.latitude$,$e.initialZoom.longitude$), 13));$endif$
+>>
+
+style(e) ::= <<$if(e.styleName)$style="@style/$e.styleName$"$endif$>>

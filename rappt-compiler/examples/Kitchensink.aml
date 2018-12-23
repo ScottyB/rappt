@@ -1,0 +1,230 @@
+app {
+  landingPage = LoginScreen
+  android-sdk "/Users/scottbarnett/android-sdk"
+  drawer tabbarId {
+    tab descriptionTab "Description" to DescriptionScreen
+    tab settingsTab "List" to EntriesList
+    tab swinburneTab "Swinburne" to WebViewScreen
+  }
+  menu globalId {
+    action ToSettings "Settings"  {
+      to Settings
+    }
+  }
+  acra "sbarnett@swin.edu.au"
+}
+
+api Prompa "http://prompa-internal.herokuapp.com/api/v1" {
+  mock-data true
+  POST init authenticateId "/auth" user.authentication_token:string "authentication_token" {
+    put emailPref user.profile.email:string
+  }
+  GET getAllEntries "/timesheet_entries" {
+    list
+    state-field status:string
+  }
+  GET getEntry "/timesheet_entries/{id}"
+}
+
+screen LoginScreen "Login" {
+  group LoginScreenGroup {
+    on-load {
+      get emailPref for emailInput
+    }
+    text-input emailInput user.email:string "Email"
+    text-input passwordId user.password:password "Password"
+    button submit "Login" {
+      call Prompa.authenticateId
+      to MapScreen
+      close true
+    }
+    layout {
+        > emailInput
+        > passwordId
+        >   | submit
+    }
+
+  }
+  action removePref "Clear Pref"  {
+    remove emailPref
+    toast toastId "EmailPrefs cleared"
+  }
+}
+
+screen MapScreen "Map Screen" {
+  group mapGroup {
+    image PicId "/Users/scottbarnett/projects/rappt/dsl/examples/image2.jpg"
+    map mapId {
+      no-interactions
+      marker sydneyIDa "Sydney" "Australia's largest city!!" -33.867 151.206
+      marker sydney2IDb "" "" -33.8472118 151.0767561
+      on-map-click {
+        to FullMapScreen
+      }
+    }
+  }
+  action currentLocation "Location"  {
+    current-location myLocation
+  }
+  action toEntries "Entries"  {
+    to EntriesList
+  }
+}
+
+screen FullMapScreen "Full Screen" {
+  group fullMap {
+    map mapId2 {
+      marker sydneyNewID1 "Sydney" "Australias largest city!!" -33.867 151.206
+      marker sydneyNewID2 "" "" -33.8472118 151.0767561
+      polyline sydneyNewID1 sydneyNewID2
+    }
+  }
+}
+
+screen EntriesList "Entries List" {
+  group EntriesGroup {
+    label valueId "Just some text"
+    button buttonId "A button"
+      on-load {
+        call Prompa.getAllEntries
+      }
+    list listId {
+      on-item-click {
+        to EntriesDetail pass entriesIdAgain id:string
+      }
+      row unsubmitted "Unsubmitted" {
+        image image:image
+        image imageIdUnique ""
+        label company.name:string
+        label job.title:string
+        label workplace_rating:string
+      }
+      row approved "Approved" {
+        label textId "Approved"
+        label job.title:string
+      }
+      row waitingApproval "Awaiting Approval" {
+        label approveId "Awaiting Approval"
+        label job.title:string
+        button anotherButton "Toast" {
+              toast anotherToast "A toast message"
+        }
+        button abuttonId "Approve" {
+          to EntriesDetail pass entriesIdAgain id:string
+        }
+      }
+    }
+  }
+  action actionId2 "Entrieslist2" {
+    to EntriesList2
+  }
+}
+
+screen EntriesList2 "Entries List" {
+  group EntriesGroup2 {
+      on-load {
+        call Prompa.getAllEntries
+      }
+    list listIdNew {
+      row unsubmitted2 {
+        image image-to-show:image
+        label company.name:string
+        label job.title:string
+        label workplace_rating:string
+      }
+    }
+  }
+}
+
+screen EntriesDetail  "Entries Detail" {
+  group EntriesDetailGroup {
+    on-load {
+      call Prompa.getEntry passed entriesIdAgain
+    }
+    map mapId3 {
+      no-interactions
+      marker entryLocation workplace.location.name:string workplace.location.latitude:string workplace.location.longitude:string
+    }
+    label company.name:string
+    label job.title:string
+    label workplace_rating:string
+    label workplace.location.address.display:string
+    label user.email:string
+  }
+  action description "TO" {
+    to DescriptionScreen
+  }
+}
+
+screen TempScreen "A Temporary screen" {
+  features globalId
+  action webId "Html" {
+    to "http://developer.android.com/guide/topics/ui/actionbar.html"
+  }
+  group groupTemp {
+    label showLabel "Temporary screen"
+  }
+}
+
+screen DescriptionScreen "Event Description" {
+  features globalId
+  group DescriptionGroup {
+    label ShowId "This is a break dancing droid!!!"
+    text-input InputId "Enter text here"
+    image PicId1 "image.jpg"
+    button ToList "Show static list" {
+      to ShowList
+    }
+    button DoNothing "Do nothing" {
+      to AnotherScreen
+    }
+  }
+}
+
+screen Details "Details Screen" {
+  group DetailsList {
+    label passed number
+  }
+}
+
+screen ShowList "Show a static List" {
+  group ListView {
+    list listId4 {
+      data ListData1 {number} "One's" "Two" "Three" "Four" "Five" "Six" "Seven" "Eight" "Nine" "Ten" "Eleven" "Twelve" "Thirteen" "Fourteen" "Fifteen"
+      on-item-click {
+        to Details pass number
+      }
+    }
+  }
+}
+
+screen AnotherScreen "Another Screen" {
+  back true
+  action searchAction "Search"
+  group AnotherGroup {
+    label ALabel "This is another screen yay!"
+    button toDes "Tabbar" {
+      to DescriptionScreen
+    }
+    button aButton "To TempScreen" {
+      to TempScreen
+      close true
+    }
+  }
+}
+
+screen Settings "Settings" {
+  group SettingsGroup {
+    label settingsLabel "Just a settings screen"
+    button toWeb "Load" {
+      to "http://developer.android.com/guide/topics/ui/actionbar.html"
+    }
+  }
+}
+
+screen WebViewScreen "Web View" {
+  group WebViewGroup {
+    web WebViewId "http://www.swinburne.edu.au/"
+  }
+  back true
+}

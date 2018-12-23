@@ -1,0 +1,10 @@
+app {
+    landingPage = mainScreen
+}
+
+screen mainScreen  {
+    title = "Main screen"
+    view {
+        text = label(text: "Hello Scott")
+    }
+}

@@ -1,0 +1,180 @@
+// Need to escape keywords
+
+model {
+    auth : {
+        value : password
+        emailAddress : string
+    }
+    sites : [
+        id : number
+        \title : string
+        content : string
+        times : [time]
+        pic : image
+        lat: number
+        long: number
+    ]
+    intro : {
+        header : string
+        body : string
+    }
+}
+
+service aService {
+    repeat {
+        tempData = cloud read appContent
+        filesystem save tempData
+    }
+}
+
+Api aComponent {
+    Endpoint {
+        url = "/hello"
+        response = appContent.sites
+    }
+    Endpoint {
+        url = "/hello/{id}"
+        request = [id : string]
+        response = appContent.@sites
+    }
+    Endpoint "/introduction" {
+        response = appContent.intro
+    }
+}
+
+app {
+    landingPage = MainScreen
+    init {
+        start LocationService
+    }
+}
+
+screen MainScreen {
+    view {
+        listId = list()
+    }
+    controller {
+        sites = filesystem read appContent.sites
+        listId <= sites
+        listId.onItemClick {
+            navigate-to DetailScreen(site: @sites)
+        }
+    }
+}
+
+LoginModule {
+    data = model.auth{
+        password => value
+        email => emailAddress
+    }
+    onClick {
+        cloud write data
+    }
+}
+
+
+screen DetailScreen(@sites site) {
+    Map {
+        id = locationMap
+        mapKey = "<MAP KEY HERE>"
+        latitude <= site.lat
+        longitude <= site.long
+    }
+}
+
+service LocationService() {
+    repeat {
+        location read
+    }
+}
+
+
+
+// source operation data
+filesystem save appContent
+
+// source operation type
+
+
+
+
+
+
+
+app {
+    landingPage = mainScreen
+}
+
+api TwitterApi  {
+    base = "https://api.twitter.com/1.1"
+    oauth {
+        api-provider "Twitter"
+        apiKey = "<TWITTER API KEY>"
+        apiSecret = "<TWITTER API SECRET>"
+        api-verifier-parameter "oauth_verifier"
+        callback "http://my-callback.com"
+    }
+    endPoints {
+        getHomeTimeline = GET (endPoint:"/statuses/home_timeline.json") {
+            request : hello
+            response : homeResults
+        }
+        getUserTimeline = GET (endPoint: "/statuses/user_timeline.json", returnsList: true)
+        getTweet = GET (endPoint: "/statuses/show/{id}.json")
+        postTweet = POST (endPoint: "/statuses/update.json")
+    }
+}
+
+
+json hello <{
+    "hello" : "people",
+    "soup" : "rabbit"
+}>
+
+
+json homeResults <{
+
+}>
+
+
+data {
+    track Location upload getUserTimeline
+    track Location notify mainScreen
+    synch People daily
+}
+
+
+screen mainScreen {
+    title = "Main"
+    model {
+        dataSource2 = source(endPoint:TwitterApi.getHomeTimeline) {
+            tweetTextId <= text
+            tweetNameId <= user.screen_name
+            tweetCreatedAt <= user.created_at
+            tweetImageId <= user.profile_image_url_https:image
+            Map.location <= data
+        }
+    }
+    view groupId {
+        button1 = button(text:"Next")
+    }
+    controller {
+        on-click button1 {
+            navigate-to tempScreen
+        }
+    }
+    component Map {
+        id = "hello"
+        location = "rabbit"
+    }
+
+}
+
+screen tempScreen {
+    title = "Main"
+    view {
+        group groupId2 {
+            button2 = button(text:"Ok")
+        }
+    }
+}

@@ -1,0 +1,76 @@
+app {
+    landingPage = Search
+    drawer drawerId {
+	tab firstTabId "Search" navigate-to Search
+	tab secondTabId "Saved Searches" navigate-to SavedSearches
+        tab thirdTabId "Recent Searches" navigate-to RecentSearches
+    }
+}
+
+api GumtreeMock {
+    base = "http://mock-gumtree-api-url"
+    mock-data true
+    endPoints {
+        recentSearches = GET(endPoint: "/recent", returnsList: true)
+    }
+}
+
+screen Search  {
+    title = "Search"
+    view {
+        group homeGroup {
+            keywords=input(hint:"Keywords")
+            options=label(text:"Advanced Options")
+            clear=button(text:"CLEAR ALL")
+            search=button(text:"SEARCH")
+            layout {
+                    >keywords
+                    > options
+                    > | clear | search
+            }
+        }
+    }
+}
+
+screen SavedSearches  {
+    title = "Saved Searches"
+    view {
+        group signInGroup {
+            email = input(hint:"Email")
+            password = input(hint:"Password")
+            signInBtn = button(text:"Sign In")
+            forgot = button(text:"Forgot Your Password?")
+            create = button(text:"Forgot Your Password?")
+            lab = label(text: "An account makes it easier to post and manage ads but is not required.")
+        }
+    }
+}
+
+screen RecentSearches  {
+    title = "Recent Searches"
+    view {
+        group aboutIdGroup {
+            list listId {
+                row rowId {
+                    headerId = label(binding: dataSource)
+                    locationId = label(binding:dataSource)
+                    sortId = label(binding:dataSource)
+                    dateId = label(binding:dataSource)
+                    layout {
+                            > headerId
+                            > locationId | dateId
+                            > sortId
+                    }
+                }
+            }
+        }
+    }
+    model {
+        dataSource = source(endPoint: GumtreeMock.recentSearches) {
+            headerId <= header
+            locationId <= location
+            sortId <= sort
+            dateId <= date
+        }
+    }
+}

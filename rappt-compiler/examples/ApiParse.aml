@@ -1,0 +1,42 @@
+app {
+    landingPage = mainScreen
+}
+
+api RestCountries  {
+    base = "http://restcountries.eu/rest/v1"
+    auth(type: parse) {
+        clientKey = ""
+        appId = ""
+    }
+
+    endPoints {
+        australia = GET (endPoint: "/alpha/")
+    }
+}
+
+screen mainScreen  {
+    title = "Australia"
+
+    model {
+        dataSource = source(endPoint: RestCountries.australia) {
+            capitalLabelId <= capital
+            regionTextId <= region
+            subRegionId <= subregion
+            nameLabelId <= name
+        }
+    }
+
+    view {
+        group mainScreenGroup {
+	    nameLabel = label (text : "Name:")
+	    CapitalLabel = label (text :"Capital City:")
+	    regionLabel = label(text: "Region:")
+	    subRegionLabel = label(text: "Sub Region:")
+
+	    nameLabelId = label(binding: dataSource)
+	    capitalLabelId = label(binding: dataSource)
+	    regionTextId = label(binding: dataSource)
+	    subRegionId = label(binding: dataSource)
+        }
+    }
+}

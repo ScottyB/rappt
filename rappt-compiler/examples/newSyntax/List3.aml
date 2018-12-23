@@ -1,0 +1,33 @@
+app {
+    landingPage = MainScreen
+}
+
+api ebanking  {
+    base = "http://yourBankingApp.api"
+    auth(type: token) {
+        tokenParam = "api-key"
+        apiKey = "AN_API_KEY"
+    }
+    endPoints {
+        account = GET (endPoint: "/account")
+    }
+}
+
+screen MainScreen  {
+    title = "Account"
+    model {
+        dataSource = source(endPoint: ebanking.account) {
+            listId <= results:list
+            amountId <= amount
+        }
+    }
+    view {
+        group mainScreenGroup {
+            list listId {
+                row rowId {
+                    amountId = label(binding: dataSource)
+                }
+            }
+        }
+    }
+}

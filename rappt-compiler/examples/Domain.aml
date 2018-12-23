@@ -1,0 +1,70 @@
+app {
+    mapKey = "KEY"
+    landingPage = Search
+    drawer drawerId {
+	tab firstTabId "Search" navigate-to Search
+        tab secondTabId "Recent & Saved Searches" navigate-to Recent
+    }
+}
+
+api DomainAPI {
+    base = "http://mock-domain-api-url"
+    mock-data true
+    endPoints {
+        recentResults = GET(endPoint: "/recent", returnsList: true)
+    }
+}
+
+screen Search  {
+    title = "Map area"
+    action notificationId "Notification" {
+        navigate-to Notifications
+    }
+    view {
+        group homeGroup {
+            map mapId {
+                sydneyId = marker (title:"Location",
+                                   text: "",
+                                   lat: -33.867,
+                                   long: 151.206)
+            }
+            registerBttn = button(text:"List")
+            signInBttn = button(text: "Save search")
+            layout {
+                    > mapId
+                    > registerBttn | signInBttn
+            }
+        }
+    }
+}
+
+screen Recent  {
+    title = "Recent & Saved Searches"
+    view {
+        group signInGroup {
+            favBttn = label(text:"Recent Searches")
+            list listId {
+                row rowId {
+                    headingLabel = label(binding:dataSource)
+                    filtersId = label(binding:dataSource)
+                }
+            }
+        }
+    }
+    model {
+        dataSource = source(endPoint: DomainAPI.recentResults) {
+            headingLabel <= heading
+            filtersId <= filter
+        }
+    }
+}
+
+screen Notifications {
+    title = "Notifications"
+    view {
+        group notificationGroup {
+            empty = label(text: "Nice work!")
+            done = label(text: "You're on top of your notifications.")
+        }
+    }
+}

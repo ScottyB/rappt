@@ -1,0 +1,203 @@
+theme {
+    primaryColour = "#13B0CB"
+}
+
+keys {
+    mapKey = "<KEY GOES HERE>"
+}
+
+
+
+app {
+    landingPage = webId
+    acra = "sbarnett@swin.edu.au"
+    tabbar tabbarId {
+        view {
+            homeTimelineTab = tab("Home Timeline")
+            userTimelineTab = tab("User Timeline")
+        }
+        controller {
+            homeTimelineTab.onClick {
+                navigate-to HomeTimeline
+            }
+            userTimelineTab.onClick {
+                navigate-to UserTimeline
+            }
+        }
+    }
+}
+
+api TwitterApi  {
+    base = "https://api.twitter.com/1.1"
+    auth(type: oauth) {
+        apiProvider = "Twitter"
+        apiKey = "<TWITTER API KEY>"
+        apiSecret = "<TWITTER API SECRET>"
+        apiVerifierParameter = "oauth_verifier"
+        callback = "http://my-callback.com"
+    }
+    endPoints {
+        getHomeTimeline = GET(endPoint: "/statuses/home_timeline.json", returnsList: true)
+        getUserTimeline = GET(endPoint: "/statuses/user_timeline.json", returnsList: true)
+        getTweet = GET(endPoint: "/statuses/show/{id}.json") {
+            response {
+                "id" : string
+                "tweet-text" : string
+            }
+        }
+        postTweet = POST("/statuses/update.json") {
+            request {
+                "data" : string
+                "text" : string
+            }
+            response {
+                "data" : string
+            }
+        }
+    }
+}
+
+screen webId  {
+    title = "Login"
+    view {
+        group webLoginView {
+            webViewId = web(authApi: TwitterApi, type: Twitter)
+        }
+    }
+    controller {
+        webViewId.onAuth {
+            navigate-to UserTimeline
+        }
+    }
+}
+
+screen UserTimeline {
+    title =  "User Timeline"
+    model {
+        currentSource = source(endPoint: TwitterApi.getUserTimeline) {
+            screenNameId <= "user.screen_name"
+            textid <= "text"
+            createdAtId <= "user.created_at"
+            profileImageId <= "user.profile_image_url_https"
+            id <= "id"
+        }
+    }
+    controller {
+        toButton.onClick {
+            navigate-to TweetDetails(passedId: currentSource.id)
+        }
+    }
+    view {
+        group userTimelineView {
+            list userTimelineList {
+                row userTweetItem {
+                    textId = label(binding: curentSource.textId)
+                    screenNameId = label(binding: currentSource.screenNameId, style: @heading)
+                    createdAtId = label(binding: currentSource.createdAtId, style: @caption)
+                    profileImageId = image(binding: currentSource.profileImageId)
+                    toButton = button(text: "Details")
+                    layout {
+                            > profileImageId | screenNameId | createdAtId
+                            > profileImageId | textId
+                            > |toButton
+                    }
+                }
+            }
+        }
+    }
+}
+
+screen HomeTimeline  {
+    title = "Home Timeline"
+    model {
+        dataSource = source(TwitterApi.getHomeTimeline) {
+            tweetNameId <= "user.screen_name"
+            tweetTextId <= "text"
+            tweetCreatedAt <= "user.created_at"
+            tweetImageId <= "user.profile_image_url_https"
+            id <= "id"
+        }
+    }
+    controller {
+        timeLineList.onItemClick {
+            navigate-to TweetDetails(passedId: dataSource.id)
+        }
+    }
+    view {
+        group homeTimeLineView {
+            list timelineList {
+                row homeTweetItem {
+                    tweetTextId = label (binding: dataSource.tweetTextId)
+                    tweetNameId = label(binding: dataSource.tweetNameId, style: @heading)
+                    tweetCreatedAt = label(binding: dataSource.tweetCreatedAt, style: @caption)
+                    tweetImageId = image(binding: dataSource.tweetImageId)
+                    layout {
+                            > tweetNameId | tweetCreatedAt
+                            > tweetImageId | tweetTextId
+                    }
+                }
+            }
+        }
+    }
+}
+
+screen TweetDetails(passedId) {
+    title "Tweet"
+    model {
+        tweetSource = source(endPoint: TwitterApi.getTweet) {
+            passedId => "id"
+            tweetDetailNameId <= "user.screen_name"
+            tweetDetailTxtId <= "text"
+            tweetDetailCreatedAtId <= "created_at"
+            tweetDetailRetweetId <= "retweet_count"
+            tweetDetailUrlId <= "user.profile_image_url_https"
+        }
+    }
+    view {
+        group tweetDetailsView {
+            tweetDetailTxtId = label(binding: tweetSource.tweetDetailTxtId)
+            tweetDetailNameId = label(binding: tweetSource.tweetDetailNameId, style: @heading)
+            tweetDetailCreatedAtId = label(binding: tweetSource.tweetDetailCreatedAtId)
+            tweetDetailRetweetId = label(binding: tweetSource.tweetSource)
+            tweetDetailUrlId = image(binding : tweetSource.tweetSource)
+            map mapId3 {
+                entryLocation = marker(title:"Tweet",
+                                       lat:-37.702225,
+                                       long:144.57202)
+            }
+        }
+    }
+    controller {
+        mapId3.onMapClick {
+            toast(text: "Map clicked")
+        }
+    }
+}
+
+screen NewTweet  {
+    close = true
+    title = "New Tweet"
+    model {
+        sendTweet = source(endPoint:TwitterApi.postTweet) {
+            inputId => "status"
+        }
+    }
+    controller {
+        submit.onClick {
+            sendTweet()
+            toast(text: "Tweet Sent")
+        }
+    }
+    view {
+        group newTweetView {
+            inputId = input(hint: "Your tweet", binding : sendTweet.inputId)
+            submit = button(text: "Tweet")
+            layout {
+                    >
+                    > inputId
+                    >
+                    > | submit
+            }
+        }
+    }
+}

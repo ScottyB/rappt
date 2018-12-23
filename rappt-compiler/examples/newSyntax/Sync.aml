@@ -1,0 +1,46 @@
+app {    landingPage = mainScreen   }
+
+model {
+    questions : [{
+        id : String
+        qustion : String,
+        date : String,
+        difficulty : Number
+    }]
+    answers : [{
+        question_id: String,
+        text : String,
+    }]
+}
+
+gcmPushNotifications {
+    key = "blah blah blah"
+    onNotification(data) {     // Types of notifications?
+        syncService.start()
+    }
+}
+
+
+service syncService {
+    // batch upload
+    answeredQuestions = database.read(model.answers)
+    cloud.write(answeredQuestions)           // write to send?
+
+    // prefetch download
+    newQuestions = cloud.read(model.questions)
+    database.write(newQuestions)
+}
+
+screen mainScreen {
+    title = "Main Screen"
+    view {
+        answerButton = Button(text: "Answer")
+    }
+    controller {
+        answerButton.onClick {
+            formData = ui.read(model.person)                 // read to readForm?
+            database.write(formData)
+            syncService.start()
+        }
+    }
+}

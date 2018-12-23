@@ -1,0 +1,41 @@
+app {
+    landingPage = mainScreen
+    onInit {
+        locationService.start()
+        syncService.start()
+    }
+}
+
+service syncService {
+    repeat(MINUTE) {
+        // batch upload location values
+        locations = store.read(locationsBuffer)
+        cloud.write(locations)
+    }
+}
+
+service locationService {
+    location {
+        onLocationUpdate(locationData) {
+            store.update(locationsBuffer, locationData)
+        }
+    }
+}
+
+screen mainScreen {
+    title = "Main Screen"
+    view {
+        startBttn = Button(text: "Start")
+        stopBttn = Button(text: "Stop")
+    }
+    controller {
+        startBttn.onClick {
+            locationService.start()
+            syncService.start()
+        }
+        stopBttn.onClick {
+            locationService.stop()
+            syncService.stop()
+        }
+    }
+}

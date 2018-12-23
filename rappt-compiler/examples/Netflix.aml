@@ -1,0 +1,58 @@
+app {
+    landingPage = home
+}
+
+
+screen home  {
+    title = "NETFLIX"
+    action signInAction "SIGN IN" {
+        navigate-to signIn
+    }
+    view {
+
+        group homeGroup {
+            web WebViewId "https://www.netflix.com/au/"
+        }
+    }
+}
+
+screen signIn  {
+    title = "NETFLIX"
+    action aboutIdAction "About" {
+        navigate-to aboutId
+    }
+    view {
+        group signInGroup {
+            email = input(hint:"Email")
+            password = input(hint:"Password")
+            signInBtn = button(text:"Sign In")
+            forgot = button(text:"Forgot Your Password?")
+            layout {
+                > email
+                > password
+                > signInBtn | forgot
+            }
+        }
+    }
+    controller {
+        on-click forgot {
+            navigate-to "https://www.netflix.com/loginhelp"
+        }
+    }
+}
+
+screen aboutId  {
+    title = "NETFLIX"
+    view {
+        group aboutIdGroup {
+            aLabel1 = label(text:"About")
+            aLabel2 = label(text: "Version 3.11.1 build 4421 (code 4421), OS API: 18 model: GT-IO300, build: browse: Falkor")
+            aLabel3 = label(text:"Diagnostics")
+            aLabel4 = label(text:"Network")
+            aLabel5 = label(text:"Legal")
+            aLabel6 = label(text:"Open Source Licences")
+            aLabel7 = label(text:"Privacy Policy")
+            aLabel8 = label(text: "Terms of Use")
+        }
+    }
+}

@@ -1,0 +1,44 @@
+app {
+    landingPage = Main
+}
+
+theme {
+    primary-colour "#004d40"
+}
+
+style labelStyle "labelTextStyle"
+style buttonStyle "buttonStyle"
+
+/* api <api id> <full api url>
+*/
+api RestCountries "http://restcountries.eu/rest/v1" {
+
+    /* <HTTP verb> <endpoint ID> <endpoint>
+       Endpoint must start with a slash
+     */
+    GET australia "/alpha/aus"
+}
+
+screen Main  {
+    title = "Australia"
+    layout mainScreen {
+
+	/* on-load is called when the screen loads */
+	on-load {
+	    call RestCountries.australia
+	}
+
+        @style(labelStyle)
+	    label nameLabel "Name:"
+
+        @caption
+        text-input intput "Input"
+
+        @body
+        label name:string
+
+        @heading
+        button tempBttn "Button"
+
+    }
+}

@@ -1,0 +1,34 @@
+app {
+    landingPage = MainScreen
+}
+
+api RestCountries {
+    base = "http://restcountries.eu/rest/v1"
+    endPoints {
+        all = GET(endPoint: "/", returnsList: true)
+    }
+}
+
+screen MainScreen  {
+    title = "List Example"
+
+    model {
+        dataSource = source(endPoint: RestCountries.all) {
+            nameLabelId <= name
+            capitalLabelId <= capital
+        }
+    }
+
+    view {
+        group mainList {
+	    listLabelId = label(text: "List of countries")
+            list countryListId {
+                row rowId {
+                    countryLabelId = label(text: "Country")
+                    nameLabelId = label(binding: dataSource)
+                    capitalLabelId = label(binding: dataSource)
+                }
+            }
+        }
+    }
+}

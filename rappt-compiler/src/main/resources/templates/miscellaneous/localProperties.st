@@ -1,0 +1,1 @@
+localProperties(directory) ::= <<sdk.dir=$directory$>>

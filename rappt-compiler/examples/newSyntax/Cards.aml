@@ -1,0 +1,47 @@
+app {    landingPage = movieListScreen  }
+
+model {
+    movie_row :{
+        title : String,
+        sub : String,
+        video : String,
+        id : String,
+        pic : Image
+    }
+    movie_row2: {
+        title : String,
+        pic_big: Image,
+        pic_small : Image,
+        sub_text : Image
+    }
+    movie_row1: {
+        title : String,
+        caption : String
+    }
+    movieCards : [movie_row, movie_row1, movie_row2]
+}
+
+screen movieListScreen {
+    view {
+        movieListId = List(rowId : newRow)
+        cards {
+            row row1 {
+                buttn = Button(text: "Like")
+            }
+            row row2 {}
+            row row3 {
+                text = Label(text: "Static text")
+            }
+        }
+    }
+    controller {
+        onInit {
+            movies = cloud.read(model.movieCards)
+            ui.write(movies) {
+                cards.row1 <= movies.movie_row
+                cards.row2 <= movies.movie_row1
+                cards.row3 <= movies.movie_row2
+            }
+        }
+    }
+}

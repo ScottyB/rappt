@@ -1,0 +1,93 @@
+app {
+    landingPage = holder
+}
+
+model {
+
+    multichoice : {
+        option1: string
+        option2: string
+        option3: string
+        option4: string
+    }
+    shortAnswer : {
+        question : string
+    }
+    questionnaire : [question]
+    answers: [
+        answer : string
+        id     : string
+    ]
+}
+
+screen holder {
+    title = "Questions"
+    Swiper {
+        screens      = [actionScreen, motivationScreen]
+        data         = questions
+        passToScreen = model.question.id
+        controller {
+            onFinished() {
+                navigate-to finalScreen
+            }
+        }
+    }
+    controller {
+        questions = database read questionnaire
+
+        onRecieved(model.answer data) {
+            answers = memory read model.answers
+            answers add data
+            memory write answers
+        }
+    }
+}
+
+screen actionScreen(string id) {
+    view {
+        buttonIs = button(text: "Next")
+    }
+    controller {
+        question = database read custom(model.question)
+        ui write question
+        buttonIs.onClick {
+            answer = ui read model.answer
+            holder send answer
+        }
+    }
+}
+
+screen finalScreen {
+    view {
+        buttonIds = button(text: "Send")
+    }
+    controller {
+        buttonsIds.onClick {
+            values = memory read [model.question]
+            database write values
+            memory delete [model.question]
+        }
+    }
+}
+
+service dataSync {
+    onDataAvailable {
+        questions = cloud read model.questionnaire
+        database write questions
+    }
+    repeat {
+        answered = database read custom([model.question])
+        cloud write answered
+    }
+}
+
+
+screen aTempScreen {
+    title = "Demo"
+    view {
+        inputText = input(hint: "password")
+        buttonid = button(text: "Send")
+        labelId = label(text: "Hi")
+        imgeId = image()
+    }
+}

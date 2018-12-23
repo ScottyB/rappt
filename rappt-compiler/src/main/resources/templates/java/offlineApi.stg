@@ -1,0 +1,78 @@
+offlineApi(object) ::= <<
+
+    public static String ERROR_API = "";
+    Context context;
+
+    public $object$(Context context) {
+        this.context = context;
+    }
+
+    Object throwExceptions(Type type, String jsonFile) {
+        try {
+            Gson gson = new Gson();
+            Thread.sleep(2000);
+            return gson.fromJson(readFileFromAssets(jsonFile, context), type);
+        } catch (JsonSyntaxException e) {
+            Log.e(ERROR_API, jsonFile + " contains a syntax error " + e.getMessage());
+        } catch (IOException e) {
+            Log.e(ERROR_API, jsonFile + " could not be found");
+        } catch (InterruptedException e) {
+            Log.e (ERROR_API, e.getMessage());
+        }
+        return new Object();
+    }
+
+ public String readFileFromAssets(String fileName, Context c) throws IOException{
+            InputStream is = c.getAssets().open(fileName);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            String text = new String(buffer);
+            return text;
+    }
+>>
+
+loadImage(toggleOffline) ::= <<
+static public void loadImage(String image, ImageView imageView, Context c) {
+$if(toggleOffline.hasMockData)$
+    if($toggleOffline.appClass$.IS_OFFLINE) {
+        final float scale = c.getResources().getDisplayMetrics().density;
+        int pixels = (int) (100 * scale + 0.5f);
+        try {
+            InputStream ims = c.getAssets().open(image);
+            Drawable d = Drawable.createFromStream(ims, null);
+            imageView.setImageDrawable(d);
+            imageView.getLayoutParams().height = pixels;
+            imageView.getLayoutParams().width = pixels;
+        }
+        catch (IOException ex) {
+        }
+    }else {
+        Picasso.with(c).load(image).resize(100, 100).into(imageView);
+    }
+$else$Picasso.with(c).load(image).resize(100, 100).into(imageView);$endif$
+}
+>>
+
+contentApiCall(apiData) ::= <<
+$if(apiData.localFile)$
+     $if(apiData.isList)$
+         Type collectionType = new TypeToken<$apiData.responseClass$\>(){}.getType();
+     $endif$
+return ($apiData.responseClass$)throwExceptions($if(apiData.isList)$collectionType$else$$apiData.responseClass$.class$endif$, "$apiData.localFile$.json");
+$elseif(apiData.isAuth)$
+this.$apiData.responseData$ = $apiData.variableName$.$apiData.functionName$($commaList(apiData.responseData)$);
+return this.$apiData.responseData$;
+$else$
+return $apiData.variableName$.$apiData.functionName$($commaList(apiData.responseData)$);
+$endif$
+>>
+
+applicationConstructor(dataStore) ::= <<
+    public $dataStore.className$ () {
+        $if(dataStore.offlineApiClass)$
+        $dataStore.apiVariable$ = IS_OFFLINE ? new $dataStore.offlineApiClass$(this) : $dataStore.setupFunction$();
+        $else$$dataStore.apiVariable$ = $dataStore.setupFunction$();$endif$
+    }
+>>

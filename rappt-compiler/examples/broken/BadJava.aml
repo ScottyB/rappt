@@ -1,0 +1,44 @@
+app {
+    landing-page Main
+}
+
+api CambridgeDictionary  "https://dictionary.cambridge.org/api/v1"  {
+    api-key  accessKey  "27EKK8kJ5vJDFeqzjcrrCq6cd3uXEkgdpXJgkeJNCkdcJGTOrpCx01GPVdxflD4R"
+    GET all "/dictionaries"  {list}
+    GET dictionary "/dictionaries/{dictCode}"
+}
+
+screen Main "List Example" {
+    group mainList {
+        label msgId "List of dictionaries"
+        on-load {
+            call CambridgeDictionary.all
+        }
+        list listId {
+            on-item-click {
+                // To pass value to details screen add pass <ID> <field value in JSON response> to 'to' command
+                navigate-to DictionaryDetail pass code dictionaryCod
+            }
+            row rowId {
+                label nameLabelId dictionaryName
+            }
+
+        }
+    }
+}
+
+screen DictionaryDetail "Dictionary" {
+    group mainScreen {
+        on-load {
+
+            // 'code' must be passed from another screen
+            call CambridgeDictionary.dictionary passed code
+        }
+        label nameLabel "Name:"
+        label restNameId dictionaryName
+        label codeLabel "Code:"
+        label restCodeId dictionaryCod
+        label urlLabel "URL:"
+        label restUrlId dictionaryUrl
+    }
+}

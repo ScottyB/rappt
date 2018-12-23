@@ -1,0 +1,10 @@
+.gradle/
+build/
+.idea/
+.vagrant/
+.DS_Store
+src/generated-sources/
+rappt-compiler.iml
+rabbitmq-settings.json
+testApps/
+genApps/

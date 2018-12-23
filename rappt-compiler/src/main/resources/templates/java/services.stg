@@ -1,0 +1,45 @@
+trackingUpdateHandler(data) ::= <<
+@Override
+    protected void onHandleIntent (Intent intent) {
+ if (intent.getAction().equals(LOCATION_UPDATE_ACTION)) {
+            Location location = intent.getParcelableExtra(LocationClient.KEY_LOCATION_CHANGED);
+            if (location != null) {
+                LocationUpdate locationUpdate = new LocationUpdate();
+                locationUpdate.issuedAt = new Date();
+                locationUpdate.latitude = location.getLatitude();
+                locationUpdate.longitude = location.getLongitude();
+                //app.locationUpdates.add(locationUpdate);
+            }
+        }
+        else if (intent.getAction().equals(ACTIVITY_UPDATE_ACTION)) {
+            if (ActivityRecognitionResult.hasResult(intent)) {
+                DetectedActivity activity = ActivityRecognitionResult.extractResult(intent).getMostProbableActivity();
+                ActivityUpdate activityUpdate = new ActivityUpdate();
+                activityUpdate.issuedAt = new Date();
+                activityUpdate.kind = activity.getType();
+                activityUpdate.confidence = activity.getConfidence();
+                //app.activityUpdates.add(activityUpdate);
+            }
+        }
+        else if (intent.getAction().equals(TRACKING_UPDATE_ACTION)) {
+            TrackingUpdates trackingUpdate = new TrackingUpdates();
+            // trackingUpdate.sessionId = app.trackedSession.id;
+            // trackingUpdate.publishedAt = new Date();
+            // trackingUpdate.locationUpdate = new ArrayList<>(app.locationUpdates);
+            // trackingUpdate.activityUpdate = new ArrayList<>(app.activityUpdates);
+            makeCall(trackingUpdate);
+        }
+    }
+
+    @Background
+    void makeCall(TrackingUpdates trackingUpdate) {
+        app.$data.api$.$data.updateCall$(trackingUpdate);
+        afterCall();
+    }
+
+    @UiThread
+    void afterCall() {
+        //app.locationUpdates.clear();
+        //app.activityUpdates.clear();
+    }
+>>

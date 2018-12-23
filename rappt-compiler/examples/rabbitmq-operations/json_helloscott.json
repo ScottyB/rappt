@@ -1,0 +1,148 @@
+{
+  "data": {
+    "model": {
+      "acra": {
+        "email": ""
+      },
+      "allApi": [],
+      "ids": {
+        "mainScreen": {
+          "data": {
+            "actions": [],
+            "enableHomeBack": false,
+            "featureIds": [],
+            "id": "mainScreen",
+            "label": "Main screen",
+            "pullToRefresh": false,
+            "view" : {
+            "group": {
+              "buttons": [],
+              "dynamicLists": [],
+              "id": "mainGrouping",
+              "labels": [
+                {
+                  "id": "labelId",
+                  "isPassed": false,
+                  "label": "Hello Scott",
+                  "onLoad": {
+                    "doesCloseActivity": false,
+                    "instructions": []
+                  },
+                  "onTouch": {
+                    "doesCloseActivity": false,
+                    "instructions": []
+                  },
+                  "parameterId": "",
+                  "styleName": "",
+                  "valuePath": {}
+                }
+              ],
+              "layoutSpecification": "",
+              "map": {},
+              "onLoad": {
+                "doesCloseActivity": false,
+                "instructions": []
+              },
+              "onTouch": {
+                "doesCloseActivity": false,
+                "instructions": []
+              },
+              "images": [],
+              "stateValue": "",
+              "staticLists": [],
+              "textInputs": [],
+              "webs": []
+            }}
+          },
+          "type": "io.rappt.model.Screen"
+        }
+      },
+      "landingPage": "mainScreen",
+      "menu": {
+        "actions": []
+      },
+      "navigation": {
+        "actions": [],
+        "disableSwipe": false,
+        "enableSubHeader": false,
+        "tabs": []
+      },
+      "newIds": {
+        "labelId": "io.rappt.model.View.Label",
+        "mainGrouping": "io.rappt.model.View",
+        "mainScreen": "io.rappt.model.Screen"
+      },
+      "packageName": "com.rappt",
+      "passedParamsToScreen": {},
+      "primaryColour": "#013499",
+      "projectName": "JsonHelloScott",
+      "screens": [
+        {
+          "actions": [],
+          "enableHomeBack": false,
+          "featureIds": [],
+          "id": "mainScreen",
+          "label": "Main screen",
+          "pullToRefresh": false,
+          "view": {
+            "buttons": [],
+            "dynamicLists": [],
+            "id": "mainGrouping",
+            "labels": [
+              {
+                "id": "labelId",
+                "isPassed": false,
+                "label": "Hello Scott",
+                "onLoad": {
+                  "doesCloseActivity": false,
+                  "instructions": []
+                },
+                "onTouch": {
+                  "doesCloseActivity": false,
+                  "instructions": []
+                },
+                "parameterId": "",
+                "styleName": "",
+                "valuePath": {}
+              }
+            ],
+            "layoutSpecification": "",
+            "map": {},
+            "onLoad": {
+              "doesCloseActivity": false,
+              "instructions": []
+            },
+            "onTouch": {
+              "doesCloseActivity": false,
+              "instructions": []
+            },
+            "images": [],
+            "stateValue": "",
+            "staticLists": [],
+            "textInputs": [],
+            "webs": []
+          }
+        }
+      ],
+      "tracker": {
+        "activityUpdateInterval": 0,
+        "apiId": "",
+        "fastestUpdateInterval": 0,
+        "locationUpdateInterval": 0,
+        "onUpdate": {
+          "doesCloseActivity": false,
+          "instructions": []
+        },
+        "registerId": "",
+        "sessionId": "",
+        "trackingInterval": 0,
+        "updatesId": ""
+      }
+    },
+    "view": "",
+    "package": "com.rappt",
+    "project-name": "JsonHelloScott"
+  },
+  "id": 102,
+  "operation": "/generate/zip"
+}

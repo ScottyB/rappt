@@ -1,0 +1,9 @@
+{
+  "operation": "/validate/dsl",
+  "data": {
+    "view": "app {landingPage = mainScreen} screen mainScreen  { title = \"Main screen\" view { group mainGrouping { labelId = label (text : \"Hello Scott\")}}}",
+    "project-name": "DslHelloScott",
+    "package": "com.rappt"
+  },
+  "id": 100
+}

@@ -1,0 +1,48 @@
+app {
+    landingPage = Main
+    android-sdk "/Users/scottbarnett/android-sdk"
+
+    /* Global menu item */
+    menu globalActions {
+	action settingsId "Settings" {
+	    to Settings
+	}
+    }
+}
+
+screen Main "Main screen" {
+
+    /* Add feature to screen.
+       A menu is one type of feature
+     */
+    features globalActions
+
+    layout mainLayout {
+	label mainLabelId "Open the menu :)"
+    }
+
+    /* An action is screen specific and displayed in the menu */
+    action showId "Show" {
+	to Show
+    }
+
+    action readId "Read" {
+	toast toastId "Read"
+    }
+
+
+
+}
+
+screen Show "Show screen" {
+    features globalActions
+    layout showScreen {
+	label labelId "Show me the money!"
+    }
+}
+
+screen Settings "A settings screen"  {
+    layout settings {
+	label settingsLabel "Add settings here!"
+    }
+}

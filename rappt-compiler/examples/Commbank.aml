@@ -1,0 +1,60 @@
+app {
+    mapKey = "YOUR MAP KEY HERE"
+    landingPage = Home
+    tabbar drawerId {
+	tab firstTabId "ATMS" navigate-to ATM
+	tab secondTabId "Branches" navigate-to Branch
+    }
+}
+
+screen ATM  {
+    title = "ATMS"
+    view {
+        group homeGroup {
+            map mapId {
+                atmMarker = marker (title:"Current",
+                                   text: "Display current location here.",
+                                   lat: -33.867,
+                                   long: 151.206)
+            }
+        }
+    }
+}
+
+screen Branch  {
+    title = "Branches"
+    view {
+        group branchGroup {
+           map branchMapId {
+                branchMarker = marker (title:"Current",
+                                   text: "Display current location here.",
+                                   lat: -33.867,
+                                   long: 151.206)
+            }
+        }
+    }
+}
+
+screen Home  {
+    title = "Commonwealth Bank"
+    view {
+        group aboutIdGroup {
+            img = image(file : "commbank.png")
+            accountBttn = button(text : "Open an account now")
+            bttn = button(text: "Find an ATM or Branch")
+            layout {
+                    > img
+                    > accountBttn
+                    > bttn
+            }
+        }
+    }
+    controller {
+        on-click bttn {
+            navigate-to ATM
+        }
+        on-click accountBttn {
+            navigate-to "https://www.commbank.com.au/personal/accounts.html"
+        }
+    }
+}

@@ -1,0 +1,8 @@
+{
+  "operation": "/non/existant/operation",
+  "data": {
+    "project-name": "OperationNonexistant",
+    "package": "com.rappt"
+  },
+  "id": 106
+}

@@ -1,0 +1,18 @@
+app {
+    landingPage MapScreen
+    mapKey "HELLO"
+}
+
+screen MapScreen {
+    title "Map"
+    view {
+        group mapGroup {
+            map mapId {
+                sydneyId = marker(title: "Sydney",
+                                  text: "Largest city in Australia ",
+                                  lat: -33.867,
+                                  long: 151.206)
+            }
+        }
+    }
+}

@@ -1,0 +1,46 @@
+app {    landingPage = movieListScreen  }
+model {
+    movies : [{
+        title : String,
+        sub : String,
+        video : String,
+        id : String,
+        pic : Image
+    }]
+    movie : {
+        pic : Image,
+        title : String,
+        text : String
+    }
+}
+
+api moviesApi {
+    base = "http://your-funky-movie-api.api/"
+    endPoints {
+        movieList = GET(path: "/movies", response: model.movies)
+        movie = GET(path: "/movies/{id}", response: model.movie)
+    }
+}
+
+screen movieListScreen {
+    view {         movieListId = List(rowId : newRow)       }
+    controller {
+        onInit {
+            movies = moviesApi.movieList.read()
+            ui.write(movies) {
+                movieListId <= movies[title, pic, id]
+            }
+        }
+        movieListId.onItemClick(singleMovie) {
+            navigate-to movieDetails(passedId : singleMovie.id)
+        }
+    }
+}
+screen movieDetails(passedId : String) {
+    controller {
+        onInit {
+            movieData = moviesApi.movie.read(id : passedId )
+            ui.write(movieData)
+        }
+    }
+}

@@ -1,0 +1,105 @@
+theme {
+    primary-colour "#004d40"
+}
+
+app {
+    landingPage = MoviesScreen
+    drawer navDrawerId {
+        tab movieScreenTab "Movies" navigate-to MoviesScreen
+        tab aboutTab "About" navigate-to AboutScreen
+    }
+    acra "sbarnett@swin.edu.au"
+}
+
+api MovieDB "https://api.themoviedb.org/3" {
+    api-key api_key "8a1bbc0ecffaea87730bdb0c597a9a27"
+    GET popularMovies "/movie/popular"
+    GET movieDetail "/movie/{id}"
+}
+
+screen MoviesScreen  {
+    title = "Movies"
+    group moviesGroup {
+        on-load {
+	    call MovieDB.popularMovies
+	    }
+	list results:list {
+	    on-item-click {
+	        navigate-to MovieDetailScreen pass idParam id
+	    }
+	    row rowId {
+                @heading
+                label titleId title
+                @caption
+                label originalLabelId "Original title: "
+                @caption
+                label loadedOriginalLabelId original_title
+                @caption
+                label voteCountLabelId "Vote count: "
+                @caption
+                label loadedVoteCountId vote_count
+                @caption
+                label averageID vote_average
+                image imgId poster_path:image
+
+                @caption
+                label releaseId release_date
+                layout {
+                    > imgId | titleId
+                    > imgId | originalLabelId  | loadedOriginalLabelId
+                    > img Id | releaseId
+                    > voteCountLabelId | loadedVoteCountId | averageID
+                }
+            }
+        }
+    }
+}
+
+screen MovieDetailScreen  {
+    title = "Movie detail"
+    group movieDetailGroup {
+		on-load {
+	    	call MovieDB.movieDetail passed idParam
+		}
+
+		image backDropId backdrop_path:image
+
+		@heading
+		label title2ID title
+
+
+		image posterImageId poster_path:image
+
+        @body
+		label overViewId overview
+
+		@caption
+		label homePageId homepage
+
+		@body
+		label popularityLabel "Popularity:"
+
+		@body
+		label restPopularity popularity
+
+		 layout {
+                > backDropId
+                >
+                > posterImageId | title2ID
+                > posterImageId | homePageId
+                > popularityLabel | restPopularity
+                >
+                > overViewId
+            }
+    }
+
+
+}
+
+screen AboutScreen  {
+    title = "About"
+    group aboutGroup {
+	label developerId "Developed by Scott"
+	label copyrightId "Copyright 2014"
+    }
+}

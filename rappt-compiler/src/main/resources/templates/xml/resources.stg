@@ -1,0 +1,85 @@
+strings(stringValues, stringArrays=false) ::= <<
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    $stringValues:{s |
+    <string name="$s.id$">$s.value$</string>
+    }$
+
+    $stringArrays:{a |
+    <string-array
+        name="$a.id$">
+        $a.values:{r |
+        <item>$r$</item>
+        }$
+    </string-array>
+    }$
+</resources>
+>>
+
+integers(integerValues) ::= <<
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    $integerValues:{s |
+    <integer name="$s.left$">$s.right$</integer>
+    }$
+</resources>
+>>
+
+styles(styles, hasButtons) ::= <<
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomTheme" parent="android:Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/ActionBar.Base</item>
+    </style>
+
+    <!-- Action bar -->
+    <style name="ActionBar.Base" parent="android:Widget.Holo.ActionBar">
+        <item name="android:titleTextStyle">@style/ActionBar.TitleText</item>
+        <item name="android:background">@color/primary</item>
+    </style>
+
+    <style name="ActionBar.TitleText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">#fff</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    $if(hasButtons)$
+    <style name="Widget.Button" parent="android:Widget.Button">
+        <item name="android:background">@drawable/custom_button</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@drawable/custom_button_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
+    </style>
+    $endif$
+
+
+    <style name="TextHeading" parent="android:TextAppearance.Large">
+        <item name="android:textColor">#DE000000</item>
+    </style>
+
+    <style name="TextCaption" parent="android:TextAppearance.Small">
+        <item name="android:textColor">#43000000</item>
+    </style>
+
+    <style name="TextBody" parent="android:TextAppearance.Medium">
+        <item name="android:textColor">#DE000000</item>
+    </style>
+
+
+    $styles:{s |
+    <style name="$s$"></style>
+    }$
+</resources>
+>>
+
+colours(colours) ::= <<
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    $colours: {c |
+    <color name="$c.left$">$c.right$</color>
+    }$
+</resources>
+>>

@@ -1,0 +1,57 @@
+intent(intent) ::= <<$(intent.template.templateName)(intent.template, intent.isFromFragment)$$if(intent.removeFromStack)$$if(intent.isFromFragment)$getActivity().$endif$context.finish();$endif$>>
+
+toIntent(i, isFromFragment) ::= <<
+$if(i.hasEvent)$
+$i.eventClassName$ event = new $i.eventClassName$();
+$intentEventParams(i.fieldParameters)$
+$i.parameters:{p| event.$p$ = $p$;}$
+EventBus.getDefault().postSticky(event);
+$endif$
+$if(!i.isFragmentToFragment)$
+$i.toClassName$_.intent($if(isFromFragment)$getActivity()$elseif(i.isFromViewController)$getContext()$else$this$endif$)$if(!i.hasEvent)$$intentParams(i.parameters)$$intentFieldParams(i.fieldParameters)$$endif$.start();
+$endif$
+>>
+
+intentFieldParams(params) ::= <<
+$params.fieldAndElementList:{p | .$p.elementId$($params.objectVariableName$$path(p.field)$)}$
+>>
+
+intentEventParams(params) ::= <<
+$if(params.fieldAndElementList)$event$params.fieldAndElementList:{p | .$p.elementId$ = $params.objectVariableName$$path(p.field)$;}$$endif$
+>>
+
+intentParams(params) ::= <<
+$if(params)$
+$params:{p | .$p$($p$)}$
+$endif$
+>>
+
+//share(extras) ::= <<
+//   Intent intent = new Intent(Intent.ACTION_SEND);
+//   intent.setType("text/plain");
+//   intent.putExtra(android.content.Intent.EXTRA_TEXT, "Test");
+//   startActivity(intent);
+//>>
+
+url(e, isFromFragment) ::= <<
+Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.$e.stringId$)));
+startActivity(intent);
+>>
+
+//map(extras) ::= <<
+//String uri = "geo:"+ $extras.longitude$ + "," + $extras.latitude$ + "?z=zoom";
+//Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
+//startActivity(intent);
+//>>
+
+// call(extras) ::= <<
+// String uri = "tel:" + $extras.phoneNumber$;
+// Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(uri));
+// startActivity(intent);
+// >>
+
+// message(extras) ::= <<
+// String uri = "sms:" + $extras.phoneNumber$;
+// Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+// startActivity(intent);
+// >>

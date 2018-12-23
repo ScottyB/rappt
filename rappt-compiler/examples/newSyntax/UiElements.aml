@@ -1,0 +1,15 @@
+app {
+    landingPage mainScreen
+}
+
+screen mainScreen {
+    title "Main screen"
+    view {
+        group mainGrouping {
+    	    labelId = label("Hello Scott")
+            yourImageId = image("image.jpg")
+            textInputId = input("Input text here")
+        }
+    }
+
+}

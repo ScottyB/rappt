@@ -1,0 +1,194 @@
+import groovy.io.FileType
+
+import java.text.SimpleDateFormat
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'application'
+
+
+mainClassName = 'io.rappt.runnableinterface.cli.CLI'
+
+ext.antlrSource = "src/main/antlr"
+ext.antlrOutput = "src/generated-sources/antlr"
+
+configurations {
+    antlr4
+}
+
+archivesBaseName = 'rappt'
+version = new SimpleDateFormat("yyyy-MM-dd").format(new Date())
+
+sourceSets.main.java.srcDir antlrOutput
+
+repositories {
+    mavenCentral()
+
+    // TODO: Remove once Swagger-codegen version 2.1.0 is officially released
+    // Swagger-codegen depends on snapshots
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+}
+
+dependencies {
+
+    compile "net.sf.jopt-simple:jopt-simple:4.7-beta-1"
+    compile "org.antlr:antlr4-runtime:4.1", { transitive = false }
+    compile "com.google.code.gson:gson:2.2.4"
+    compile "org.antlr:stringtemplate:4.0.2"
+    compile "org.apache.commons:commons-lang3:3.0"
+    compile "com.google.guava:guava:17.0"
+    compile 'com.github.abrarsyed.jastyle:jAstyle:1.2'
+    compile 'org.apache.commons:commons-io:1.3.2'
+    compile 'org.jooq:joox:1.2.0'
+    compile 'com.rabbitmq:amqp-client:3.4.3'
+
+    // TODO: Replace with Swagger-codegen version 2.1.0 once officially released
+    // Swagger-codegen 2.1.0 is only availiable as snapshot
+    compile "com.wordnik:swagger-codegen:2.1.0-SNAPSHOT"
+
+    // Antlr4 tool path used with the antlr4 task
+    antlr4 "org.antlr:antlr4:4.1"
+
+    testCompile 'junit:junit:4.10'
+}
+
+task generateGrammarSource {
+    description = "Generates Java sources from Antlr4 grammars."
+    inputs.dir file(antlrSource)
+    outputs.dir file(antlrOutput)
+} << {
+    mkdir(antlrOutput)
+    def grammars = fileTree(antlrSource).include("**/*.g4")
+    def packageName = "io.rappt"
+
+    // TODO: Could use javaExec instead
+    ant.java(classpath: "${configurations.antlr4.asPath}", fork: true, outputproperty: 'out', classname: 'org.antlr.v4.Tool') {
+        arg(line: "-o ${antlrOutput}/${packageName.replace(".", "/")}")
+        arg(line: "-visitor -Werror")
+        arg(line: "-package ${packageName}")
+        arg(line: grammars.files.join(" "))
+    }
+    println(ant.project.properties.out)
+}
+
+compileJava {
+    dependsOn generateGrammarSource
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
+}
+
+run {
+    if (project.hasProperty('args')) {
+        args project.args.split('\\s+')
+    }
+}
+
+jar {
+    from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
+    manifest {
+        attributes 'Main-Class': mainClassName,
+                //'Implementation-Title': 'Foobar',
+                //'Implementation-Version': version,
+                //'Built-By': System.getProperty('user.templateName'),
+                'Built-Date': new Date(),
+                'Built-JDK': System.getProperty('java.version')
+
+    }
+}
+
+def genAppsDir = new File('genApps/')
+if (!genAppsDir.exists()) {
+    genAppsDir.mkdirs()
+}
+
+// applies operation over each root project dir
+def genAppsClosure = { op ->
+    genAppsDir.eachFile FileType.DIRECTORIES, {
+        op(it)
+    }
+}
+
+// finds the android project dir within a root project dir
+def androidProjectDir (File rootProjectDir) {
+    // Expect "ProjectName-ProjectId" or "ProjectName" as rootProjectDir
+    String projectName = rootProjectDir.name.split("-")[0]
+    File androidProjectDir = new File (rootProjectDir, projectName)
+    return androidProjectDir
+}
+
+clean {
+    FileTree tree = fileTree(dir: 'genApps')
+    tree.exclude '**/androidTest/**'
+    tree.each {File file ->
+        delete file
+    }
+}
+
+test {
+    outputs.upToDateWhen { false }
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
+
+def addShellPrefix(String command) {
+    def commandArray = new String[3]
+    commandArray[0] = "sh"
+    commandArray[1] = "-c"
+    commandArray[2] = command
+    return commandArray
+}
+
+private def executeOnShell(String command, File workingDir) {
+    println command
+    def process = new ProcessBuilder(addShellPrefix(command))
+            .directory(workingDir)
+            .redirectErrorStream(true)
+            .start()
+    process.inputStream.eachLine { println it }
+    process.waitFor();
+    return process.exitValue()
+}
+
+task buildGenApps(dependsOn: test) {
+    def user = System.getenv()['ANDROID_HOME']
+    if (!user)
+        throw new RuntimeException("ANDROID_HOME not set")
+    doLast {
+        genAppsClosure {
+            File androidDir = androidProjectDir(it)
+            executeOnShell("chmod u+x ./gradlew", androidDir)
+            new File("${androidDir}/local.properties").withWriter { out ->
+                out.writeLine("sdk.dir=${user}")
+            }
+            println "Building ${androidDir}"
+            if (executeOnShell("./gradlew --daemon build", androidDir))
+                throw new RuntimeException("Error building ${androidDir}")
+        }
+    }
+}
+
+task testGenApps(dependsOn: test) {
+    def user = System.getenv()['ANDROID_HOME']
+    if (!user)
+        throw new RuntimeException("ANDROID_HOME not set")
+
+    doLast {
+        genAppsClosure {
+            File androidDir = androidProjectDir(it)
+            executeOnShell("chmod u+x ./gradlew", androidDir)
+            new File("${androidDir}/local.properties").withWriter { out ->
+                out.writeLine("sdk.dir=${user}")
+            }
+            println "Building ${androidDir}"
+            if (executeOnShell("./gradlew --daemon cAT", androidDir))
+                throw new RuntimeException("Error building ${androidDir}")
+        }
+    }
+}

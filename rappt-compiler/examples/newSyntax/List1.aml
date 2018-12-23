@@ -1,0 +1,32 @@
+model {
+    countries : [
+        name: string
+        capital : string
+    ]
+}
+
+app {
+    landingPage =  MainScreen
+}
+
+api RestCountries  {
+    base = "http://restcountries.eu/rest/v1"
+    endPoints {
+        countries = GET(endPoint: "/{id}", response: model.countries) {
+            "country_name" = name
+            "country_capital" = capital
+        }
+    }
+}
+
+screen MainScreen "List Example" {
+    controller {
+        anId = "test-id"
+        data = RestCountries.countries(id: anId) read model.countries
+        mainList <= data
+    }
+    view {
+        listLabelId = label( "List of countries")
+        mainList = list()
+    }
+}

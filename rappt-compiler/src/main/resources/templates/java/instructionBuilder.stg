@@ -1,0 +1,151 @@
+fieldPath(showFields) ::= <<$showFields.dataVariable$.$showFields.fieldPaths :{ fp | $path(fp)$}$>>
+path(fp) ::= <<$fp.values:{p|$if(p.isList)$$else$.$p.valueName$$endif$}$>>
+
+androidField(androidField) ::= <<$androidField.objectVariableName$$androidField.fieldAndElementList:{f | $path(f.field)$}$>>
+
+putPreference(data) ::= <<
+$data.field.fieldAndElementList:{ f |
+prefs.$f.elementId$().put($data.field.objectVariableName$$path(f.field)$);
+}$
+>>
+getPreference(data) ::= <<$data.fieldId$.setText(prefs.$data.preferenceId$().get());>>
+removePreference(data) ::= <<prefs.$data.preferenceId$().remove();>>
+
+showToast(data) ::= << Toast.makeText(context, R.string.$data$, Toast.LENGTH_LONG).show();>>
+
+buildDataFromForm(form) ::= <<
+$form.field.objectClass$ $form.field.objectVariableName$ = new $form.field.objectClass$();
+
+$form.field.fieldAndElementList:{ f |
+$form.field.objectVariableName$$path(f.field)$ = this.$f.elementId$.getText().toString();
+}$
+return $form.field.objectVariableName$;
+>>
+
+buildRequestFunction(request) ::= <<
+
+  try {
+      $request.responseHandler$(app.$request.api$.$request.dataCallFunction$($if(request.parameter)$$request.parameter$$endif$$if(request.loadDataFunction)$$request.loadDataFunction$()$endif$));
+  } catch (Exception e) {
+      ErrorDialog.showError(context, e);
+  }
+>>
+
+progressDialog(data) ::= <<
+
+    void loadingStarted() {
+        dialog = ProgressDialog.show(context, "", "Please Wait...");
+    }
+
+    @UiThread
+    void loadingFinished() {
+        dialog.dismiss();
+    }
+>>
+
+displayData(itemViewData) ::= <<
+$itemViewData.fieldAndElementList:{ f |
+$if(f.field.isImage)$
+  Utils.loadImage($itemViewData.objectVariableName$$path(f.field)$, this.$f.elementId$,context);
+$endif$
+$if(f.field.isString)$
+   this.$f.elementId$.setText($itemViewData.objectVariableName$$path(f.field)$);
+$endif$
+}$>>
+
+displayMarkers(m) ::= <<
+googleMap.addMarker(new MarkerOptions()
+        .title($androidField(m.title)$)
+        .position(new LatLng(Double.parseDouble($androidField(m.latitude)$),
+           Double.parseDouble($androidField(m.longitude)$))));
+googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble($androidField(m.latitude)$),
+           Double.parseDouble($androidField(m.longitude)$)), 13));
+>>
+
+
+setAdapter(templateValue) ::= <<
+$templateValue$.setAdapter(adapter);
+>>
+
+loadAdapter(loadAdapter) ::= <<
+        if (data$if(loadAdapter.listField)$.$loadAdapter.listField$$endif$.isEmpty()) {
+            message.setText(R.string.$loadAdapter.noDataStringId$);
+        } else {
+            message.setVisibility(View.GONE);
+            $if(loadAdapter.listId)$$loadAdapter.listId$.setVisibility(View.VISIBLE);
+            adapter.setData(data$if(loadAdapter.listField)$.$loadAdapter.listField$$endif$);
+            adapter.notifyDataSetChanged();
+            $endif$
+        }
+>>
+
+dataFromTag(data) ::= <<$data.className$ $data.variableName$ = ($data.className$) getTag();>>
+callNotification(data) ::= << $data.functionName$($data.id$, $androidField(data.title)$, $androidField(data.content)$);>>
+
+storeLoadedData(data=false) ::= <<this.data = data;>>
+
+getLocation(data=false) ::= <<
+    if (ErrorDialog.servicesConnected(this)) {
+        Location currentLocation = mLocationClient.getLastLocation();
+        Toast.makeText(this, currentLocation.getLatitude() + " " + currentLocation.getLongitude(), Toast.LENGTH_LONG).show();
+    }
+>>
+
+currentLocation(data=false) ::= <<
+    @Override
+    public void onStart() {
+        super.onStart();
+        mLocationClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        mLocationClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.i(GOOGLE_PLAY_SERVICE, getString(R.string.google_play_connected));
+    }
+
+    @Override
+    public void onDisconnected() {
+        Log.i(GOOGLE_PLAY_SERVICE, getString(R.string.google_play_disconnected));
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        if (connectionResult.hasResolution()) {
+            try {
+                connectionResult.startResolutionForResult(
+                        this,
+                        CONNECTION_FAILURE_RESOLUTION_REQUEST);
+            } catch (IntentSender.SendIntentException e) {
+                e.printStackTrace();
+            }
+        } else {
+            ErrorDialog.servicesConnected(this, connectionResult.getErrorCode());
+        }
+        Log.e(GOOGLE_PLAY_SERVICE, getString(R.string.google_play_failed));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        switch (requestCode) {
+            case CONNECTION_FAILURE_RESOLUTION_REQUEST:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        Log.d(GOOGLE_PLAY_SERVICE, getString(R.string.google_play_issue_resolved));
+                        break;
+                    default:
+                        ErrorDialog.showError(this, getString(R.string.google_play_client_disconnected));
+                        break;
+                }
+            default:
+                Log.d(GOOGLE_PLAY_SERVICE, getString(R.string.google_play_unknown) + requestCode);
+                break;
+        }
+    }
+>>

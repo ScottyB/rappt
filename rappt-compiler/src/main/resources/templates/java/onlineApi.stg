@@ -1,0 +1,132 @@
+authenticationOAuth(dataStore) ::= <<
+  public String fetchAuthURL() {
+        oAuthService = new ServiceBuilder()
+                .provider(TwitterApi.class)
+                .apiKey(API_KEY)
+                .apiSecret(API_SECRET)
+                .callback(CALLBACK)
+                .build();
+        requestToken = oAuthService.getRequestToken();
+        String temp = oAuthService.getAuthorizationUrl(requestToken);
+        return temp;
+    }
+
+    public void fetchAccessToken(Uri responseURI) {
+        Log.d(API_LOG, responseURI.toString());
+        String verifier = responseURI.getQueryParameter(VERIFIER_PARAMETER);
+        Log.d(API_LOG, verifier);
+        Verifier v = new Verifier(verifier);
+        accessToken = oAuthService.getAccessToken(requestToken, v);
+        Log.d(API_LOG, accessToken.getRawResponse());
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .setEndpoint(TWITTERAPI_SERVICE)
+                .setRequestInterceptor(this)
+                .build();
+        Log.d(API_LOG, "Rest adapter built");
+        twitterApi = restAdapter.create(TwitterApiApi.class);
+    }
+
+    private String getMethod(RequestInterceptor.RequestFacade requestFacade) throws NoSuchFieldException, IllegalAccessException {
+        Field requestMethod = requestFacade.getClass().getDeclaredField("requestMethod");
+        requestMethod.setAccessible(true);
+        return (String) requestMethod.get(requestFacade);
+    }
+
+    private String getUrl(RequestInterceptor.RequestFacade requestFacade) throws NoSuchFieldException, IllegalAccessException {
+        Field apiUrl = requestFacade.getClass().getDeclaredField("apiUrl");
+        apiUrl.setAccessible(true);
+        String apiUrlValue = (String) apiUrl.get(requestFacade);
+        Field relativeUrl = requestFacade.getClass().getDeclaredField("relativeUrl");
+        relativeUrl.setAccessible(true);
+        String relativeUrlValue = (String) relativeUrl.get(requestFacade);
+        return apiUrlValue + relativeUrlValue;
+    }
+
+    @Override
+    public void intercept(RequestFacade requestFacade) {
+        try {
+            String url = getUrl(requestFacade), method = getMethod(requestFacade);
+            Log.d(API_LOG, "url: " + url);
+            Log.d(API_LOG, "method: " + method);
+            OAuthRequest req = new OAuthRequest(Verb.valueOf(method), url);
+            oAuthService.signRequest(accessToken, req);
+            Log.d(API_LOG, "Request signed");
+            for (Map.Entry<String, String> m : req.getHeaders().entrySet()) {
+                Log.d(API_LOG, "KEY: " + m.getKey() + " VALUE: " + m.getValue());
+                requestFacade.addHeader(m.getKey(), m.getValue());
+            }
+        } catch (NoSuchFieldException e) {
+            Log.d(API_LOG, "No such field: reflection");
+        } catch (IllegalAccessException e) {
+            Log.d(API_LOG, "Illegal access to fields");
+        }
+    }
+>>
+
+standardOnlineApiConstructor(dataStore) ::= <<
+    public $dataStore.apiClass$ $dataStore.className$() {
+           RestAdapter restAdapter = new RestAdapter.Builder()
+           .setLogLevel(RestAdapter.LogLevel.FULL)
+                    $if(dataStore.classVariable || dataStore.apiKey)$.setRequestInterceptor(new RequestInterceptor() {
+                       @Override
+                       public void intercept(RequestFacade requestFacade) {
+                        $if(dataStore.classVariable)$
+                           if ($dataStore.classVariable$ != null) {
+                               requestFacade.addQueryParam("$dataStore.authToken$", $dataStore.authTokenPath.objectVariableName$$path(first(dataStore.authTokenPath.fieldAndElementList).field)$);
+                           }
+                        $endif$
+                        $if(dataStore.apiKey)$
+                            requestFacade.addQueryParam("$dataStore.apiKey$", "$dataStore.apiValue$");
+                        $endif$
+                       }
+                   })$endif$
+                   .setEndpoint($dataStore.apiName$)
+                   .build();
+           return restAdapter.create($dataStore.apiClass$.class);
+       }
+ >>
+
+parseObjectContent(className) ::= <<
+ParseQuery<$className$> query = ParseQuery.getQuery("$className$");
+query.whereEqualTo("objectId", "1Ega4NBN4m");
+$className$ values = query.find().get(0);
+values.load();
+return values;
+>>
+
+parseListContent(className) ::= <<
+ParseQuery<$className$> query = ParseQuery.getQuery("$className$");
+
+// Todo: Find a nicer way to handle loading Parse result into an object!!!
+List<$className$> results = query.find();
+for ($className$ temp : results) {
+    temp.load();
+}
+return results;
+>>
+
+parseConstructor(data) ::= <<
+@Override
+public void onCreate() {
+super.onCreate();
+Parse.enableLocalDatastore(this);
+$data.classes:{c | ParseObject.registerSubclass($c$.class);}$
+Parse.initialize(this, "$data.appId$", "$data.clientKey$");
+ParseACL defaultACL = new ParseACL();
+ParseACL.setDefaultACL(defaultACL, true);
+$data.variableName$ = new $data.className$();
+}
+>>
+
+parseObjectLoad(data) ::= <<
+public void load () {
+     $data:{v |
+     $if(v.isId)$
+     $v.value$ = getObjectId();
+     $else$
+     $v.value$ = getString("$v.value$");
+     $endif$
+     }$
+}
+>>

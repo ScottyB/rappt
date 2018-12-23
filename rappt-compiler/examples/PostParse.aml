@@ -1,0 +1,94 @@
+app {
+    landingPage = Main
+}
+
+api RestCountries  {
+    auth(type: parse) {
+        clientKey = ""
+        appId = ""
+    }
+    endPoints {
+        all = GET(endPoint: "/alpha", returnsList:true)
+        CountryCode = GET (endPoint: "/alpha/{code}")
+        add = POST(endPoint: "/alpha")
+    }
+}
+
+screen Main  {
+    title = "List Example"
+    model {
+        dataSource = source(endPoint : RestCountries.all) {
+            nameLabelId <= name
+            capitalLabelId <= capital
+        }
+    }
+
+    view {
+        group mainList {
+	    msgId = label(text: "List of countries")
+            buttonId = button(text: "Add country")
+            list listId {
+                on-item-click {
+                    navigate-to CountryDetail(passedString : id)
+                }
+                row rowId {
+                    nameLabelId = label(binding: dataSource)
+                    capitalLabelId = label(binding: dataSource)
+                }
+
+            }
+        }
+    }
+    controller {
+        on-click buttonId {
+            navigate-to AddCountry
+        }
+    }
+}
+
+screen CountryDetail(string passedString)  {
+    title = "Country"
+    model {
+        asource = source(endPoint: RestCountries.CountryCode) {
+            passedString => code
+            restNameId <= name
+            restCapitalId <= capital
+            restSubRegion <= subregion
+            restRegionId <= region
+        }
+    }
+    view {
+        group mainScreen {
+            nameLabel = label(text: "Name:")
+            restNameId = label(binding: asource)
+            CapitalLabel = label(text: "Capital City:")
+            regionLabel = label(text: "Region:")
+            restCapitalId = label(binding: asource)
+            restRegionId = label(binding: asource)
+            restSubRegion = label(binding: asource)
+            subRegionLabel = label(text: "Sub Region:")
+        }
+    }
+}
+
+screen AddCountry {
+    title = "Add Country"
+    model {
+        addCountrySource = source(endPoint: RestCountries.add) {
+            addCountry => name
+            addCapital => capital
+        }
+    }
+    view {
+        group countryGroup {
+            addCountry = input(binding: addCountrySource hint: "Name")
+            addCapital = input(binding: addCountrySource hint: "Capital")
+            submit = button(text: "Submit")
+        }
+    }
+    controller {
+        on-click submit {
+            toast toastId "Country added!"
+        }
+    }
+}

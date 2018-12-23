@@ -1,0 +1,65 @@
+app {
+    landingPage = Main
+}
+
+api RestCountries  {
+    auth(type: parse) {
+        clientKey = ""
+        appId = ""
+    }
+    endPoints {
+        all = GET(endPoint: "/alpha", returnsList:true)
+        CountryCode = GET (endPoint: "/alpha/{code}")
+    }
+}
+
+screen Main  {
+    title = "List Example"
+    model {
+        dataSource = source(endPoint : RestCountries.all) {
+            nameLabelId <= name
+            capitalLabelId <= capital
+        }
+    }
+
+    view {
+        group mainList {
+	    msgId = label(text: "List of countries")
+            list listId {
+                on-item-click {
+                    navigate-to CountryDetail(passedString : id)
+                }
+                row rowId {
+                    nameLabelId = label(binding: dataSource)
+                    capitalLabelId = label(binding: dataSource)
+                }
+
+            }
+        }
+    }
+}
+
+screen CountryDetail(string passedString)  {
+    title = "Country"
+    model {
+        asource = source(endPoint: RestCountries.CountryCode) {
+            passedString => code
+            restNameId <= name
+            restCapitalId <= capital
+            restSubRegion <= subregion
+            restRegionId <= region
+        }
+    }
+    view {
+        group mainScreen {
+            nameLabel = label(text: "Name:")
+            restNameId = label(binding: asource)
+            CapitalLabel = label(text: "Capital City:")
+            regionLabel = label(text: "Region:")
+            restCapitalId = label(binding: asource)
+            restRegionId = label(binding: asource)
+            restSubRegion = label(binding: asource)
+            subRegionLabel = label(text: "Sub Region:")
+        }
+    }
+}

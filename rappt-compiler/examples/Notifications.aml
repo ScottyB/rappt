@@ -1,0 +1,34 @@
+app {
+landingPage = Main
+  android-sdk "/Users/scottbarnett/android-sdk"
+}
+
+api myApi "http://my-api.com/api" {
+  mock-data true
+  GET getNotifications "/notification"
+}
+
+screen Main  {
+    title = "The main screen"
+  layout MainLayout {
+    label labelId "Hello Scott"
+    button showNotification "Show notification" {
+      notification notification1 "image.jpg" "Title" "Some content text" {
+        to Test
+      }
+    }
+    button showAnotherNotification "Show Another" {
+      call myApi.getNotifications
+      notification notification2 "image.jpg" title:string content:string {
+        to Test
+      }
+    }
+  }
+}
+
+screen Test  {
+    title = "Test screen"
+  layout anotherLayout {
+    label textLabel "You are not on the test screen"
+  }
+}

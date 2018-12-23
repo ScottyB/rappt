@@ -1,0 +1,219 @@
+javaClass(classPackage, classImports, classAnnotations, className, classExtends, classImplements, classFields, classContent) ::= <<
+package $classPackage$;
+
+$if(classImports)$
+$classImports: {import | import $import$;
+}$
+$endif$
+
+
+$classAnnotations: {a |$templateType(a)$}$
+public class $className$ $extends(classExtends)$ $implementsTemplate(classImplements)$ {
+
+$classFields: {f |
+$if(f.annotation)$$(f.annotation.templateName)(f.annotation.templateValue)$$endif$
+public $f.type$ $f.fieldName$ $if(f.initNewObject)$= new $f.type$($if(f.param)$this$endif$)$elseif(f.initValue)$= $f.initValue$$endif$;
+
+}$
+$classContent: {c |$templateType(c)$
+
+}$
+}
+>>
+
+extends(classExtends) ::= <<
+$if(classExtends)$extends $classExtends$$endif$
+>>
+
+implementsTemplate(classImplements) ::= <<
+$if(classImplements)$
+implements $classImplements; separator=","$
+$endif$
+>>
+
+parseAnnotation(value) ::= << @ParseClassName("$value$")>>
+annotationsAcra(param) ::= <<
+
+@ReportsCrashes(formKey = "",
+    mailTo = "$param$",
+    customReportContent = {
+        ReportField.APP_VERSION_CODE,
+        ReportField.APP_VERSION_NAME,
+        ReportField.ANDROID_VERSION,
+        ReportField.BUILD,
+        ReportField.BRAND,
+        ReportField.PHONE_MODEL,
+        ReportField.DEVICE_FEATURES,
+        ReportField.AVAILABLE_MEM_SIZE,
+        ReportField.ENVIRONMENT,
+        ReportField.DISPLAY,
+        ReportField.SETTINGS_SYSTEM,
+        ReportField.USER_APP_START_DATE,
+        ReportField.USER_CRASH_DATE,
+        ReportField.THREAD_DETAILS,
+        ReportField.LOGCAT,
+        ReportField.EVENTSLOG,
+        ReportField.STACK_TRACE
+    })>>
+annotationService(param) ::= <<@EIntentService>>
+annotationsSerializedName(param) ::= <<@SerializedName("$param$")>>
+annotationsOverride(param) ::= <<@Override>>
+annotationsActivity(layout) ::= <<@EActivity(R.layout.$layout$)>>
+annotationsFragment(layout) ::= <<@EFragment(R.layout.$layout$)>>
+annotationsEActivity(param=false) ::= <<@EActivity>>
+annotationsRootContext(param=false) ::= <<@RootContext>>
+annotationStringRes(param) ::= <<@StringRes(R.string.$param$)>>
+annotationsOptionsMenu(items) ::= <<@OptionsMenu({$if(items)$R.menu.$first(items)$$rest(items): {r | , R.menu.$r$}$$endif$})>>
+annotationInsertBean(param=false) ::= <<@Bean>>
+annotationApp(param=false) ::= <<@App>>
+annotationsAfter(param=false) ::= <<@AfterViews>>
+annotationsNoTitle(param=false) ::= <<@NoTitle>>
+annotationOptionItem(param=false) ::= <<@OptionsItem>>
+annotationClick(param=false) ::= <<@Click>>
+annotationApplication(param=false) ::= <<@EApplication>>
+annotationsBackground(param=false) ::= <<@Background>>
+annotationsUiThread(param=false) ::= <<@UiThread>>
+annotationsPrefs(param=false) ::= <<@SharedPref(value=SharedPref.Scope.UNIQUE)>>
+annotationsPrefField(param=false) ::= <<@Pref>>
+annotationPath(param) ::= <<@Path("$param$")>>
+annotationBody(param=false) ::= <<@Body>>
+annotationPost(endpoint) ::= << @POST("$endpoint$") >>
+annotationGet(endpoint) ::= <<@GET("$endpoint$")>>
+annotationBean(param=false) ::= <<@EBean>>
+annotationGroup(layout) ::= <<@EViewGroup(R.layout.$layout$)>>
+annotationExtra(param=false) ::= <<@Extra>>
+annotationFindView(param=false) ::= <<@ViewById>>
+annotationFindFragmentId(param=false) ::= <<@FragmentById>>
+annotationItemClick(param=false) ::= <<@ItemClick>>
+
+contentHomeSelected(param=false) ::= <<
+	@OptionsItem
+	void homeSelected() {
+              context.finish();
+	}
+>>
+
+javaFunction(javaFunction) ::= <<
+$javaFunction.functionAnnotations: {a |$templateType(a)$}$
+$javaFunction.modifier$ $javaFunction.returnType$ $javaFunction.functionName$ ($functionParameters(javaFunction.parameters)$)$if(javaFunction.functionContent)$ $if(javaFunction.functionThrows)$throws $javaFunction.functionThrows$ $endif${
+$javaFunction.functionContent: { c |$templateType(c)$}$
+} $elseif(javaFunction.isInterface)$;$else${}$endif$
+>>
+
+functionParameters(params) ::= <<$if(first(params).annotation.templateName)$$(first(params).annotation.templateName)(first(params).annotation.templateValue)$ $endif$$first(params).type$ $first(params).name$$if(rest(params))$   $rest(params) :{p | , $if(p.annotation.templateName)$$(p.annotation.templateName)(p.annotation.templateValue)$$endif$$p.type$  $p.name$}$$endif$
+>>
+
+templateType(template) ::= <<$if(template.templateValue)$$(template.templateName)(template.templateValue)$
+$elseif(template.templateObject)$$(template.templateName)(template.templateObject)$
+$else$$(template.templateName)(template)$$endif$>>
+
+javaInterface(interfacePackage, interfaceImports, interfaceName, interfaceFunctions, annotation, classFields) ::= <<
+package $interfacePackage$;
+
+$if(interfaceImports)$
+$interfaceImports: {import | import $import$;
+}$
+$endif$
+
+$if(annotation)$$(annotation.templateName)()$$endif$
+public interface $interfaceName$ {
+
+$classFields: {f |
+$if(f.annotation)$$(f.annotation.templateName)(f.annotation.templateValue)$$endif$
+public $f.type$ $f.fieldName$ $if(f.initNewObject)$= new $f.type$($if(f.param)$this$endif$)$endif$$if(f.initValue)$= $f.initValue$$endif$;
+
+}$
+
+$interfaceFunctions:{f |$(f.templateName)(f)$}$
+}
+>>
+
+commaList(data) ::= <<$if(data)$$first(data)$$rest(data): {r | , $r$}$$endif$>>
+
+contentLogout(isFragment) ::= <<
+    @OptionsItem
+    void logout() {
+         Login_.intent($if(isFragment)$getActivity()$else$this$endif$).start();
+        $if(isFragment)$getActivity().$endif$finish();
+        prefs.authToken().remove();
+    }
+>>
+
+contentDefaultContext(data) ::= <<
+public $data.className$(Context context) {
+   super(context);
+   $if(data.hasContext)$this.context = context;$endif$
+}>>
+
+
+contentReceiveEventData(param=false) ::= <<
+    @Override
+    public void onResume() {
+        EventBus.getDefault().registerSticky(this);
+        super.onResume();
+    \}
+
+    @Override
+    public void onPause() {
+        EventBus.getDefault().unregister(this);
+        super.onPause();
+    \}
+>>
+
+contentHeader(headerText) ::= <<
+    @ViewById
+    TextView header;
+
+    @AfterViews
+        void loadHeaderText() {
+        header.setText(R.string.$headerText$);
+    }
+>>
+
+contentCreate(savedInstance) ::= <<
+    super.onCreate($savedInstance$);
+>>
+
+contentContextVariable(value) ::= <<context = $if(value.isFragment)$getActivity()$else$this$endif$;>>
+contentShowHome(param) ::= <<
+  context.getActionBar().setDisplayHomeAsUpEnabled(true);
+>>
+
+contentContextLocation(data) ::= <<mLocationClient = new LocationClient(this, this, this);>>
+
+functionCall(data) ::= <<$data.functionName$($data.parameters;separator=","$);>>
+
+hideKeyboard(data) ::= <<
+    private void hideKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(context.INPUT_METHOD_SERVICE);
+        if(imm.isAcceptingText()) {
+            imm.hideSoftInputFromWindow(context.getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+>>
+
+acraOnCreate(param=false) ::= <<
+  @Override
+  public void onCreate() {
+    super.onCreate();
+    ACRA.init(this);
+  }
+>>
+
+notificationContent(data) ::= <<
+NotificationCompat.Builder mBuilder =
+    new NotificationCompat.Builder(this)
+    .setSmallIcon(R.drawable.$data.icon$)
+    .setContentTitle($data.titleParam$)
+    .setContentText($data.contentParam$);
+     $if(data.to)$Intent resultIntent = new Intent(this, $data.to$_.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack($data.to$_.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setContentIntent(resultPendingIntent);$endif$
+        NotificationManager mNotifyMgr =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mNotifyMgr.notify($data.idParam$, mBuilder.build());
+>>

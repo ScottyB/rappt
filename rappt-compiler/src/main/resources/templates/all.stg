@@ -1,0 +1,13 @@
+import "templates/miscellaneous"
+import "templates/java"
+import "templates/xml"
+import "templates/xml/resources.stg"
+import "java/class.stg"
+import "java/services.stg"
+import "java/intent.stg"
+import "java/offlineApi.stg"
+import "java/onlineApi.stg"
+import "java/contentAdapter.stg"
+import "java/instructionBuilder.stg"
+import "xml/uiElements.stg"
+temp() ::= << >>

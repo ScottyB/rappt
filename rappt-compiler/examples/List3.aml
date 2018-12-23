@@ -1,0 +1,129 @@
+app {
+    landingPage = Main
+}
+
+theme {
+    primary-colour "#235434"
+    secondary-colour "#443322"
+
+    // Definition of new styles
+    style newTextStyle "CustomTextStyle"
+    style newImageStyle "CustomImageStyle"
+
+}
+
+api RestCountries  {
+    base = "http://restcountries.eu/rest/v1"
+    GET all "/" { list }
+    GET CountryCode "/alpha/{code}"
+}
+
+api myApi "api.yaml" {
+    // Response stubs
+    "/users" => "users.json"
+    "/people" => "people.json"
+}
+
+screen Main  {
+    title = "List Example"
+    data {
+        read apiCall RestCountries.all {
+            param code alphaCode
+            bind nameId user.name
+            bind capitalId user.capital
+
+            string alphaCode user.alphaCode
+        }
+
+        write apiWrite RestCountries.newCountry {
+            param able alphaValue
+            bind countryName inputFieldName
+        }
+
+        delete apiDelete RestCountries.removeCountry {
+            param id alphaValue
+        }
+
+        String alphaValue = passedValueId
+
+
+
+    }
+
+    behaviour {
+        on-click buttnId {
+            to CountryDetail pass(alphaCode)
+        }
+        on-click anotherbuttonId {
+            call apiWrite
+        }
+    }
+
+    view {
+        group mainList {
+            list listId {
+                row row2 {
+                    label nameId "Country Name"
+                    label restNameId ApiCall.name
+                    label capitalId "Capital City"
+                    label restCapitalId ApiCall.capital
+                    image pictureId "ic_launcher.png"
+                    button buttnId "Details"
+                }
+            }
+        }
+    }
+
+
+    // 'presentation' is a bit long, maybe design?
+    presentation {
+        layout row2 {
+            > nameId | restNameId
+            > capitalId
+            > restCapitalId
+            > pictureId
+            > buttnId
+        }
+
+        // @ prefix for system styles
+        apply @heading restNameId
+        apply @caption nameId, capitalId
+
+        // Apply style to ids
+        apply newTextStyle restCapitalId
+        apply newImageStyle pictureId
+    }
+}
+
+screen CountryDetail  {
+    title = "Country"
+    view {
+        group mainScreen {
+            label nameLabel "Name:"
+            label restName ApiCall.name
+            label CapitalLabel "Capital City:"
+            label restCapital ApiCall.capital
+            label regionLabel "Region:"
+            label restReigon ApiCall.region
+            label subRegionLabel "Sub Region:"
+            label restSubRegion ApiCall.subregion
+            label populiationLabel "Population"
+            label restPopulation ApiCall.population
+        }
+    }
+
+    data {
+        source ApiCall RestCountries.CountryCode {
+            // source block used to prepare request values
+            // prepare query parameter
+            // query-param <param> <value>
+            query-param code alphaCode
+        }
+    }
+
+    presentation {
+        apply newTextStyle restPopulation, restCapital
+        apply @heading nameLabel
+        apply @body restName, restRegion
+    }
+}

@@ -1,0 +1,23 @@
+app {
+  landing-page mainScreen
+}
+
+api WeatherAPI "http://api.openweathermap.org/data/2.5" {
+  GET cityweather "/weather?q={city}"
+}
+
+screen mainScreen "Weather" {
+  group mainScreenGroup {
+    input citySearchField "City"
+
+    button searchButton "Search"
+
+    label tempLabel "Temperature:"
+    label cityTemperatureLabel temp
+  }
+
+  behaviour {
+    on-click searchButton {
+      call WeatherAPI.cityweather citySearchField
+    }
+  }

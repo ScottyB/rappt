@@ -1,0 +1,12 @@
+app {
+    landingPage NewScreen
+}
+
+model {
+    person
+}
+
+screen NewScreen {
+    title = "Contacts"
+
+}

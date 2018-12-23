@@ -1,0 +1,228 @@
+AppModel(appModel) ::= <<
+$\\$
+$! Calling the .toAml() method (or just .aml when calling from a StringTemplate) on Classes that implement PIM !$
+$! will render the object using the template corresponding to the Class name. !$
+$\\$
+$! Templates that start with uppercase correspond to a Class. !$
+$! Templates that start with lowercase are ordinary StringTemplates intended to be used within other templates. !$
+$\\$
+app {
+    landingPage = $appModel.landingPage$
+    $if(appModel.mapKey)$mapKey = $appModel.mapKey;format="amlString"$$endif$
+    $if(appModel.navigation.navigationMethod)$$appModel.navigation.aml$$endif$
+}
+
+$appModel.allApi: {a|$a.aml$}; separator="\n\n"$
+
+$appModel.screens: {s|$s.aml$}; separator="\n\n"$
+
+>>
+
+Api(api) ::= <<
+api $api.id$ {
+    $if(api.isParseApp)$
+    auth(type: parse){
+        clientKey = "$api.clientKey$"
+        appId = "$api.appId$"
+    }
+    $elseif(api.isTokenApp)$
+    base = $api.rootURL;format="amlString"$
+    auth(type: token) {
+        tokenParam = "$api.apiParamKey$"
+        apiKey = "$api.apiParamValue$"
+    }
+    $else$
+    base = $api.rootURL;format="amlString"$
+    $endif$
+    endPoints {
+        $api.resources: {r|$r.aml$}; separator="\n"$
+    }
+}
+>>
+
+Resource(resource) ::= <<
+$resource.id$ = $resource.method$ ( endPoint :$resource.endPoint;format="amlString"$ $if(resource.isList)$, returnsList : true$endif$)
+>>
+
+Screen(screen) ::= <<
+screen $screen.id$  $if(screen.parameter)$(string $screen.parameter$)$endif${
+$! Todo: check for empty screen titles !$
+    title = $screen.label;format="amlString"$
+    view {
+        group $screen.view.id$ {
+            $screen.view.aml$
+        }
+    }
+$if(screen.model)$$Model(screen.model)$$endif$
+
+$screen.view.buttons: {b|
+$if(first(b.onTouch.instructions).toScreenId)$
+    controller {
+         on-click $b.id$ {
+             navigate-to $first(b.onTouch.instructions).toScreenId$
+         \}
+    \}
+$endif$
+    }$
+}
+>>
+
+Button(button) ::= <<
+$button.id$ = button(text :$button.label;format="amlString"$)
+>>
+
+Label(label) ::= <<
+$label.id$ = label( $if(label.valuePath)$binding: $label.source.id$$else$text : $label.label;format="amlString"$$endif$)
+>>
+
+Image(image) ::= <<
+$if(image.valuePath)$ $image.id$ = image (binding: $image.source.id$)$\\$
+$else$$image.id$ = image (file :$image.image;format="amlString"$)$\\$
+$endif$
+>>
+
+list(uiCollection) ::= <<
+list $uiCollection.id$ {
+    $uiCollection.listItemLayouts: listItem(); separator="\n"$
+$if(uiCollection.onItemClick.instructions)$
+    on-item-click {
+        $instructions(uiCollection.onItemClick.instructions)$
+    }
+$endif$
+}
+>>
+
+TextInput(textInput) ::= <<
+$if(textInput.valuePath)$ $textInput.id$ = input (binding : $textInput.source.id$)$\\$
+$else$$textInput.id$ = input ($if(textInput.hintText)$hint:$textInput.hintText;format="amlString"$$endif$)$\\$
+$endif$
+>>
+
+StaticList(staticList) ::= <<
+$list(staticList)$
+>>
+
+DynamicList(dynamicList) ::= <<
+$list(dynamicList)$
+>>
+
+listItem(listItem) ::= <<
+row $listItem.layout.id$ {
+    $listItem.layout.aml$
+}
+>>
+
+Model(model) ::= <<
+    model {
+        $model.dataSources:{s | $s.id$ = source(endPoint:$s.api.id$.$s.resource.id$)
+$if(s.fromBindings || s.toBindings)$
+        {
+$if(s.fromBindings)$
+$s.fromBindings.keys:{ k|
+            $k$ <= $ValuePath(s.fromBindings.(k))$
+}$
+$endif$
+$if(s.toBindings)$
+$s.toBindings.keys:{ k|
+            $k$ => $ValuePath(s.toBindings.(k))$ }$
+$endif$
+      \}
+$endif$
+
+}$
+    }
+>>
+
+View(view) ::= <<
+$view.labels: {l|
+
+$l.aml$}$$\\$
+$view.buttons: {b|
+
+$b.aml$}$$\\$
+$view.textInputs: {t|
+
+$t.aml$}$$\\$
+$view.images: {p|
+
+$p.aml$}$$\\$
+$view.staticLists: {l|
+
+$l.aml$}$$\\$
+$view.dynamicLists: {l|
+
+$l.aml$}$$\\$
+$if(view.map.aml)$
+$view.map.aml$$endif$
+>>
+
+controller(uiBase) ::= <<
+controller {
+    on-click $uiBase.id$ {
+         $instructions(uiBase.onTouch.instructions)$
+    }
+}
+>>
+
+Navigation(navigation) ::= <<
+$navigationMethod(navigation.navigationMethod)$ $navigation.id$ {
+    $navigation.tabs: {t|$t.aml$}; separator="\n"$
+}
+>>
+
+navigationMethod(navigationMethod) ::= <<
+$navigationMethod;format="lowercase"$
+>>
+
+Tab(tab) ::= <<
+tab $tab.id$ $tab.text;format="amlString"$ $tab.to.aml$
+>>
+
+Map(map) ::= <<
+map $map.id$ {
+    $map.staticMarkers:staticMarker(); separator="\n"$
+    $map.dynamicMarkers:dynamicMarker(); separator="\n"$
+    $map.polyLines:polyLine(); separator="\n"$
+    $if(map.noInteractions)$no-interactions$endif$
+$if(map.onMapClick.instructions)$
+    on-map-click {
+        $instructions(map.onMapClick.instructions)$
+    }
+$endif$
+}
+>>
+
+staticMarker(staticMarker) ::= <<
+$staticMarker.id$ = marker (title: $staticMarker.title;format="amlString"$, text: $staticMarker.description;format="amlString"$, lat: $staticMarker.latitude$, long: $staticMarker.longitude$)
+>>
+
+dynamicMarker(dynamicMarker) ::= <<
+$dynamicMarker.id$ = marker (title: $valuePath(dynamicMarker.titlePath)$, lat: $valuePath(dynamicMarker.latitudePath)$, long: $valuePath(dynamicMarker.longitudePath)$, text: $valuePath(dynamicMarker.descriptionPath)$)
+>>
+
+polyLine(polyline) ::= <<
+polyline $polyline.markerStartId$ $polyline.markerEndId$
+>>
+
+instructions(instructions) ::= <<
+$instructions: {instruction|$instruction.aml$}; separator="\n"$
+>>
+
+Navigate(navigate) ::= <<
+navigate-to $navigate.toScreenId$ $if(navigate.fieldParameter)$($navigate.parameterId$ : $ValuePath(navigate.fieldParameter)$)$endif$
+>>
+
+Call(call) ::= <<
+$! Todo: un-comment once API is implemented !$
+$if(call.parameter)$call $call.apiId$.$call.resourceId$ passed $call.parameter$$\\$
+$else$call $call.apiId$.$call.resourceId$$\\$
+$endif$
+>>
+
+ValuePath(valuePath) ::= <<
+$valuePath.path: {jsonPath|$jsonPath.fieldName$$fieldType(jsonPath.fieldType)$}; separator="."$
+>>
+
+fieldType(fieldType) ::= <<
+:$fieldType;format="lowercase"$
+>>

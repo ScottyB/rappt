@@ -1,0 +1,8 @@
+{
+  "operation": "/validate/dsl",
+  "data": {
+    "project-name": "DslMissing",
+    "package": "com.rappt"
+  },
+  "id": 101
+}

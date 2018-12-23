@@ -1,0 +1,88 @@
+app {
+    landingPage = Main
+}
+
+api Cards "http://made-up-cards.com/api" {
+    mock-data true
+    GET allCards "/" {list}
+}
+
+screen Main  {
+    title = "Main Screen"
+    view {
+        group mainGroup {
+            on-load {
+                call Cards.allCards
+            }
+            list listId {
+                row row1 {
+                    image imgId image:image
+
+                    @heading
+                    label title1 title:string
+
+                    @caption
+                    label sub1 sub:string
+
+                    @body
+                    label sub2 sub1:string
+
+                    @heading
+                    label nameId "Name"
+
+                    @heading
+                    label bookingId "Booking Number"
+                    label nameId1 name:string
+                    label refId ref:string
+                    image img1Id image1:image
+
+                    @caption
+                    label seatLabelId "Seat"
+                    @caption
+                    label rowLabelId "Row"
+                    @caption
+                    label sectionLabelId "Section"
+
+                    @body
+                    label seatId seat:string
+                    @body
+                    label rowId rowElement:string
+                    @body
+                    label sectionId section:string
+                    @body
+                    label dateId date:string
+                    @body
+                    label addressId address:string
+
+                    @caption
+                    label ticketTypeId ticketType:string
+                    button navBttn "Navigate" {
+
+                    }
+                    button emailBttn "View Email" {
+
+                    }
+                    layout {
+                            > imgId | title1
+                            > imgId | sub1
+                            > imgId | sub2
+                            >
+                            > nameId | bookingId
+                            > nameId1 | refId
+                            >
+                            > img1Id
+                            >
+                            > seatLabelId | rowLabelId | sectionLabelId
+                            > seatId | rowId | sectionId
+                            >
+                            > dateId
+                            > addressId
+                            > ticketTypeId
+                            > navBttn
+                            > emailBttn
+                    }
+                }
+            }
+        }
+    }
+}

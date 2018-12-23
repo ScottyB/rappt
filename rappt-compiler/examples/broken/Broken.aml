@@ -1,0 +1,68 @@
+app {
+    landingPage = _gen0
+    tabbar _gen5 {
+        tab _gen4 "Movies" navigate-to _gen0
+        tab _gen6 "WelcomeScreen" navigate-to _gen2
+    }
+}
+
+
+api RestCountries {
+    base = "https://api.themoviedb.org/3"
+    endPoints {
+        all = GET(endPoint: "/", returnsList: true)
+        Movie =GET(endPoint:"/movie/popular")
+    }
+}
+
+
+screen _gen0  {
+    title = "Movies"
+  model{
+    dataSource1= source(endPoint: RestCountries.popular){
+      nameLabel<=name
+
+      }
+    }
+    view {
+        group _gen0MainGrouping {
+         labelList= label(text: "List of Movies")
+      list listId{
+          on-item-click{
+            navigate-to Movie1(anId: alpha2Code)
+          }
+        row rowId{
+
+        nameLabel=label(binding:dataSource1)
+        }
+          }
+
+
+        }
+    }
+}
+
+screen Movie1(string anId)  {
+    title = "Movie"
+  model{
+    dataSource2= source(endPoint: RestCountries.movie){
+     anId =>code
+     MovielLabel <=original_title
+
+      }
+    }
+    view {
+        group _gen1MainGrouping {
+          MovieLabel=label(binding:dataSource2)
+        }
+    }
+}
+
+screen _gen2  {
+    title = "WelcomeScreen"
+    view {
+        group _gen2MainGrouping {
+          msg=label(text:"Welcome to the movie Database")
+        }
+    }
+}

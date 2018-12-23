@@ -1,0 +1,63 @@
+app {
+    landingPage Main
+}
+
+api RestCountries "http://restcountries.eu/rest/v1" {
+    GET all "/" {list}
+    GET countryCode "/alpha/{code}"
+}
+
+screen Main  {
+    title "List Example"
+    model {
+        code = string()
+        source(api: RestCountries, endPoint: all) {
+            "alpha2Code" => code
+            "name" => nameLabelId
+            "capital" => capitalLabelId
+        }
+    }
+
+    controller {
+        listId.onItemClick {
+            navigate-to CountryDetail(code)
+        }
+    }
+
+    view {
+        group mainList {
+	    msgId = label( "List of countries")
+            list listId {
+                row rowId {
+                    label nameLabelId, capitalLabelId
+                }
+            }
+        }
+    }
+}
+
+screen CountryDetail(code)  {
+    title "Country"
+    model {
+        source(api:RestCountries, endPoint: countryCode) {
+            request {
+                "code" = code
+            }
+            response {
+                restNameId  = "name"
+                restCapitalId = "capital"
+                restRegionId = "region"
+                restSubRegion = "subregion"
+            }
+        }
+    }
+    view {
+        group mainScreen {
+            restSubRegion, restRegionId, restNameId, restCapitalId = label()
+            nameLabel = label( "Name:")
+            CapitalLabel = label ( "Capital City:")
+            regionLabel = label("Region:")
+            subRegionLabel = label("Sub Region:")
+        }
+    }
+}

@@ -1,0 +1,112 @@
+adapterData(contentData) ::= <<
+$if(contentData.hasMultipleViews)$
+$contentData.states:{ s |
+    @StringRes(R.string.$s.stringId$)
+    String $s.stateVariable$;
+
+}$
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        $contentData.dataClass$ item = getItem(position);
+        View itemView = new View(super.context);
+    $contentData.states:{ s |
+        if (item$path(first(contentData.stateField.fieldAndElementList).field)$.equals($s.stateVariable$)) {
+            itemView = $s.functionName$(convertView, item);
+        \}
+    }$
+        itemView.setTag(item);
+        return itemView;
+    }
+
+$contentData.states:{ s |
+    public View $s.functionName$(View convertView, $contentData.dataClass$ item) {
+        $s.viewControllerName$ itemView;
+        if (convertView == null || !(convertView instanceof $s.viewControllerName$)) {
+            itemView = $s.viewControllerName$_.build(super.context);
+        \} else {
+            itemView = ($s.viewControllerName$) convertView;
+        \}
+        itemView.bind(item);
+        itemView.setTag(item);
+        return itemView;
+    \}
+
+}$
+$else$
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+$contentData.states:{ s |
+        $contentData.dataClass$ item = getItem(position);
+        $s.viewControllerName$ itemView;
+        if (convertView == null) {
+            itemView = $s.viewControllerName$_.build(super.context);
+        \} else {
+            itemView = ($s.viewControllerName$) convertView;
+        \}
+        itemView.bind(getItem(position));
+        itemView.setTag(item);
+        return itemView;
+
+}$
+    }
+$endif$
+>>
+
+adapter(templateVariable) ::= <<
+
+package $templateVariable$;
+
+import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.RootContext;
+import java.util.List;
+
+@EBean
+public abstract class DefaultAdapter<T> extends BaseAdapter {
+
+    List<T> items;
+
+    @RootContext
+    public Context context;
+
+    public void setData(List<T> items) {
+        this.items = items;
+    }
+
+    public boolean hasNoData() {
+        return items == null || items.isEmpty();
+    }
+
+    @Override
+    public int getCount() {
+        if (items != null) {
+            return items.size();
+        }
+        return 0;
+    }
+
+    @Override
+    public T getItem(int position) {
+        if (items != null)  {
+            return items.get(position);
+        }
+        return null;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        if (items != null) {
+            return items.get(position).hashCode();
+        }
+        return 0;
+    }
+
+    @Override
+    abstract public View getView(int position, View convertView, ViewGroup parent);
+
+}
+>>

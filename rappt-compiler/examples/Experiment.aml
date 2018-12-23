@@ -1,0 +1,82 @@
+app {
+    landingPage = MoviesScreen
+    tabbar navDrawerId {
+        tab movieScreenTab "Movies" navigate-to MoviesScreen
+        tab aboutTab "About" navigate-to AboutScreen
+    }
+}
+
+api MovieDB  {
+    base = "https://api.themoviedb.org/3"
+    auth(type : token) {
+        apiKey = "8a1bbc0ecffaea87730bdb0c597a9a27"
+        tokenParam = "api_key"
+    }
+    endPoints {
+        popularMovies = GET (endPoint:"/movie/popular")
+        movieDetail = GET (endPoint:"/movie/{id}")
+    }
+}
+
+screen MoviesScreen  {
+    title = "Movies"
+    model {
+        dataSource = source(endPoint: MovieDB.popularMovies) {
+            loadedOriginalLabelId <= original_title
+            imgId <= poster_path:image
+            listId <= results:list
+        }
+    }
+    view {
+        group moviesGroup {
+	    list listId {
+	        on-item-click {
+	            navigate-to MovieDetailScreen(param: id)
+	        }
+	        row rowId {
+                    loadedOriginalLabelId = label( binding: dataSource)
+                    imgId = image( binding: dataSource)
+                    layout {
+                            > imgId | loadedOriginalLabelId
+                    }
+                }
+            }
+        }
+    }
+}
+
+screen MovieDetailScreen(string param)  {
+    title = "Movie detail"
+    model {
+        aSource = source (endPoint: MovieDB.movieDetail) {
+            param => id
+            backDropId <= backdrop_path:image
+            overViewId <= overview
+            homePageId <= homepage
+            restPopularity <= popularity
+        }
+    }
+    view    {
+        group movieDetailGroup {
+	    backDropId = image( binding: aSource)
+	    overViewId = label( binding: aSource)
+	    homePageId = label( binding: aSource)
+	    restPopularity = label( binding: aSource)
+	    layout {
+                > backDropId
+                > homePageId | restPopularity
+                > overViewId
+            }
+    }}
+
+}
+
+screen AboutScreen  {
+    title = "About"
+    view {
+        group aboutGroup {
+	    developerId = label(text: "Developed by Scott")
+	    copyrightId = label(text: "Copyright 2014")
+        }
+    }
+}

@@ -1,0 +1,65 @@
+app {
+    landingPage = Search
+    drawer drawerId {
+	tab firstTabId "Search" navigate-to Search
+    }
+}
+
+api SeekAPIMock {
+    base = "http://mock-seek-api-url"
+    mock-data true
+    endPoints {
+        searchResults = GET(endPoint: "/search", returnsList: true)
+    }
+}
+
+screen Search  {
+    title = "Search"
+    view {
+        group homeGroup {
+            registerBttn = button(text:"Register")
+            signInBttn = button(text: "Sign in")
+            keywords=input(hint:"Enter keyword(s)")
+            searchBttn=button(text:"seek")
+            layout {
+                    > registerBttn | signInBttn
+                    > keywords
+                    > searchBttn
+            }
+        }
+    }
+    controller {
+        on-click searchBttn {
+            navigate-to JobsScreen
+        }
+    }
+}
+
+screen JobsScreen  {
+    title = "Seek"
+    view {
+        group signInGroup {
+            favBttn = button(text:"Favourite this search")
+            list listId {
+                row rowId {
+                    headingLabel = label(binding:dataSource)
+                    companyLabel = label(binding:dataSource)
+                    imgLogo = image(binding:dataSource)
+                    locationLabel = label(binding:dataSource)
+                    typeLabel = label(binding:dataSource)
+                    descriptionLabel = label(binding:dataSource)
+                }
+            }
+        }
+    }
+    model {
+        dataSource = source(endPoint: SeekAPIMock.searchResults) {
+            headingLabel <= heading
+            companyLabel <= company
+            imgLogo <= logo:image
+            locationLabel <= location
+            typeLabel <= timeType
+            descriptionLabel <= description
+        }
+    }
+}

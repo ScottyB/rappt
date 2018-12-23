@@ -1,0 +1,53 @@
+app {
+    landingPage = mainScreen
+    onInit {
+        start location
+    }
+}
+
+model {
+    australia : {
+        capital : string
+        region: string
+        name: string
+        subregion: string
+    }
+}
+
+api RestCountries {
+    base = "http://restcountries.eu/rest/v1"
+    endPoints {
+        aus = GET(path: "/alpha/aus", response: model.australia) {
+            "aus_capital" => capital
+            "aus_region" => region
+            "aus_name" => name
+            "subregion" => subregion
+        }
+    }
+}
+
+view mainScreen  {
+    title = "Australia"
+    controller {
+        ausData = cloud read model.australia
+        ui write ausData [name, capital]
+        $ButtonPlus {
+
+        }
+    }
+}
+
+view dafdf {
+    controller {
+        values = database read custom(model.images)
+        objects = ui read model.images
+        cloud write RestCountries(objects)
+    }
+}
+
+service location {
+    repeat {
+        ausData = cloud read model.australia
+        database write ausData
+    }
+}
