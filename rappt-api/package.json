@@ -1,0 +1,19 @@
+{
+  "name": "rappt-editr-api",
+  "description": "RAPPT Editr restful API",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "body-parser": "^1.9.0",
+    "cors": "2.4.2",
+    "express": "4.9.5",
+    "mkdirp": "^0.5.0",
+    "mailgun": "latest",
+    "rimraf": "^2.2.8",
+    "redis": "latest",
+    "hiredis": "latest",
+    "q": "~1.0",
+    "rabbit.js": "latest",
+    "array.prototype.find": "latest"
+  }
+}

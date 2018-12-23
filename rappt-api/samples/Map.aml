@@ -1,0 +1,25 @@
+app {
+    landingPage = MapScreen
+    mapKey = "HELLO"
+    tabbar tabbarId {
+        tab tab1 "Map" navigate-to MapScreen
+    }
+}
+
+screen MapScreen  {
+    title = "Map"
+    view {
+        group mapGroup {
+
+            // You need to create an API Key
+            // https://developers.google.com/maps/documentation/android/start#getting_the_google_maps_android_api_v2
+            // map <ID>
+            map mapId {
+                sydneyId = marker (title:"Sydney",
+                                   text: "Largest city in Australia ",
+                                   lat: -33.867,
+                                   long: 151.206)
+            }
+        }
+    }
+}

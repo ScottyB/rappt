@@ -1,0 +1,23 @@
+app {
+    landingPage = mainScreen
+}
+
+screen mainScreen  {
+    title = "Main screen"
+    view {
+        group mainGrouping {
+            labelId = label(text: "Hello Scott")
+
+            // Note: image.jpg needs to be added into the drawable directory
+            yourImageId = image (file: "image.jpg")
+
+            /*
+              Multiline comment
+
+              Accept input from user
+              input <ID> <hint text>
+            */
+            textInputId = input (hint: "Input text here")
+        }
+    }
+}

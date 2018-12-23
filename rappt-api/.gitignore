@@ -1,0 +1,8 @@
+node_modules/
+tmp_rapt/
+*.log
+android.txt
+app.txt
+intermediate.txt
+.vagrant/
+config.js
